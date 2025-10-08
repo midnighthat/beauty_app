@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "544909827",
+    "firebase_url": "https://beauty-care-91802-default-rtdb.firebaseio.com",
+    "project_id": "beauty-care-91802",
+    "storage_bucket": "beauty-care-91802.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:544909827:android:5379ee37c3031d4c8f3c36",
+        "android_client_info": {
+          "package_name": "com.example.beauty_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "544909827-j06ddvjqn5iau7s6t95q54vqo05e0203.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.beauty_app",
+            "certificate_hash": "67cc70bca2a000097fbff761c883a70201067f6f"
+          }
+        },
+        {
+          "client_id": "544909827-kc2t70dc6klm7m1sj2a2fefrnhdujs8c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmtXD50Z4tQC6Xtv1CCMK2JAo_7gExsmA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "544909827-kc2t70dc6klm7m1sj2a2fefrnhdujs8c.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "544909827-e0r7studuo1mbads050a95hitq6a79a1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.beautyApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
