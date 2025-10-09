@@ -29,6 +29,7 @@ class CustomText extends StatelessWidget {
   final double? fontSize;
   final double? letterSpacing;
   final double? height;
+  final TextDecoration? decoration;
 
   const CustomText(
     this.text, {
@@ -42,6 +43,7 @@ class CustomText extends StatelessWidget {
     this.fontSize,
     this.letterSpacing,
     this.height,
+    this.decoration,
   });
 
   @override
@@ -148,6 +150,7 @@ class CustomText extends StatelessWidget {
       color: color ?? defaultColor,
       letterSpacing: letterSpacing,
       height: height,
+      decoration: decoration,
     );
   }
 }
@@ -266,6 +269,7 @@ class TitleText extends StatelessWidget {
   final Color? color;
   final TextAlign? textAlign;
   final int? maxLines;
+  final double? fontSize;
 
   const TitleText(
     this.text, {
@@ -273,6 +277,7 @@ class TitleText extends StatelessWidget {
     this.color,
     this.textAlign,
     this.maxLines,
+    this.fontSize,
   });
 
   @override
@@ -283,6 +288,7 @@ class TitleText extends StatelessWidget {
       color: color,
       textAlign: textAlign,
       maxLines: maxLines,
+      fontSize: fontSize,
     );
   }
 }

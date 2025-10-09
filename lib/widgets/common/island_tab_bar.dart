@@ -81,36 +81,35 @@ class _IslandTabBarState extends State<IslandTabBar>
       margin: const EdgeInsets.all(20),
       child: Container(
         height: 70,
-        decoration: BoxDecoration(
-          gradient: AnimatedBuilder(
-            animation: _backgroundAnimation,
-            builder: (context, child) {
-              return LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppColors.primaryPink,
-                  Color.lerp(
-                    AppColors.primaryPink.withOpacity(0.8),
+        child: AnimatedBuilder(
+          animation: _backgroundAnimation,
+          builder: (context, child) {
+            return Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
                     AppColors.primaryPink,
-                    _backgroundAnimation.value * 0.3,
-                  )!,
+                    Color.lerp(
+                      AppColors.primaryPink.withOpacity(0.8),
+                      AppColors.primaryPink,
+                      _backgroundAnimation.value * 0.3,
+                    )!,
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(35),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primaryPink.withOpacity(0.4),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
+                  ),
                 ],
-              );
-            },
-          ),
-          borderRadius: BorderRadius.circular(35),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primaryPink.withOpacity(0.4),
-              blurRadius: 15,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: List.generate(widget.items.length, (index) {
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(widget.items.length, (index) {
             final isSelected = index == widget.currentIndex;
             final item = widget.items[index];
             
@@ -171,7 +170,10 @@ class _IslandTabBarState extends State<IslandTabBar>
                 },
               ),
             );
-          }),
+                }),
+              ),
+            );
+          },
         ),
       ),
     );

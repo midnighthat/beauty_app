@@ -37,10 +37,6 @@ class _BookingTabState extends ConsumerState<BookingTab> {
             ),
             child: Row(
               children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back, color: AppColors.white),
-                  onPressed: () {},
-                ),
                 const Expanded(
                   child: TitleText(
                     'Set Appointment',

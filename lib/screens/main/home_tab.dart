@@ -148,17 +148,38 @@ class HomeTab extends ConsumerWidget {
                 Expanded(
                   child: CustomCard(
                     type: CardType.filled,
-                    child: Column(
+                    child: Stack(
                       children: [
-                        CaptionText(
-                          'Score your skin',
-                          color: isDark ? AppColors.creamBackground.withOpacity(0.7) : AppColors.lightText,
+                        Column(
+                          children: [
+                            CaptionText(
+                              'Score your skin',
+                              color: isDark ? AppColors.creamBackground.withOpacity(0.7) : AppColors.lightText,
+                            ),
+                            const SizedBox(height: 8),
+                            DisplayText(
+                              '$skinScore%',
+                              color: AppColors.primaryPink,
+                              isLarge: true,
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 8),
-                        DisplayText(
-                          '$skinScore%',
-                          color: AppColors.primaryPink,
-                          isLarge: true,
+                        // Performance indicator
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: skinScore >= 80 
+                                  ? Colors.green 
+                                  : skinScore >= 60 
+                                      ? Colors.orange 
+                                      : Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -168,17 +189,53 @@ class HomeTab extends ConsumerWidget {
                 Expanded(
                   child: CustomCard(
                     type: CardType.filled,
-                    child: Column(
+                    child: Stack(
                       children: [
-                        CaptionText(
-                          'Score skin age',
-                          color: isDark ? AppColors.creamBackground.withOpacity(0.7) : AppColors.lightText,
+                        Column(
+                          children: [
+                            CaptionText(
+                              'Score skin age',
+                              color: isDark ? AppColors.creamBackground.withOpacity(0.7) : AppColors.lightText,
+                            ),
+                            const SizedBox(height: 8),
+                            DisplayText(
+                              '$skinAge',
+                              color: AppColors.primaryPink,
+                              isLarge: true,
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 8),
-                        DisplayText(
-                          '$skinAge',
-                          color: AppColors.primaryPink,
-                          isLarge: true,
+                        // Age indicator
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: skinAge <= 25 
+                                  ? Colors.green.withOpacity(0.2)
+                                  : skinAge <= 35 
+                                      ? Colors.orange.withOpacity(0.2)
+                                      : Colors.red.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              skinAge <= 25 
+                                  ? 'Young'
+                                  : skinAge <= 35 
+                                      ? 'Mature'
+                                      : 'Aging',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: skinAge <= 25 
+                                    ? Colors.green
+                                    : skinAge <= 35 
+                                        ? Colors.orange
+                                        : Colors.red,
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -264,31 +321,7 @@ class HomeTab extends ConsumerWidget {
             
             const SizedBox(height: 32),
             
-            // Action buttons
-            Row(
-              children: [
-                Expanded(
-                  child: PrimaryButton(
-                    text: 'Retake Quiz',
-                    onPressed: () => Navigator.pushNamed(context, '/quiz'),
-                    size: ButtonSize.medium,
-                    icon: const Icon(Icons.refresh, color: AppColors.white),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: SecondaryButton(
-                    text: 'Book Appointment',
-                    onPressed: () {
-                      // Switch to appointment tab (index 2)
-                    },
-                    size: ButtonSize.medium,
-                    icon: const Icon(Icons.calendar_today, color: AppColors.primaryPink),
-                  ),
-                ),
-              ],
-            ),
-            
+           
             // Add bottom padding for the island tab bar
             const SizedBox(height: 100),
           ],

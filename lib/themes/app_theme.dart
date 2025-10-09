@@ -29,41 +29,41 @@ class AppTheme {
         onSecondary: AppColors.darkText,
         onSurface: AppColors.darkText,
       ),
-      textTheme: GoogleFonts.abelTextTheme().copyWith(
-        displayLarge: GoogleFonts.abel(
+      textTheme: GoogleFonts.rubikTextTheme().copyWith(
+        displayLarge: GoogleFonts.rubik(
           fontSize: 32,
           fontWeight: FontWeight.bold,
           color: AppColors.darkText,
         ),
-        displayMedium: GoogleFonts.abel(
+        displayMedium: GoogleFonts.rubik(
           fontSize: 28,
           fontWeight: FontWeight.bold,
           color: AppColors.darkText,
         ),
-        headlineLarge: GoogleFonts.abel(
+        headlineLarge: GoogleFonts.rubik(
           fontSize: 24,
           fontWeight: FontWeight.w600,
           color: AppColors.darkText,
         ),
-        headlineMedium: GoogleFonts.abel(
+        headlineMedium: GoogleFonts.rubik(
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: AppColors.darkText,
         ),
-        titleLarge: GoogleFonts.abel(
+        titleLarge: GoogleFonts.rubik(
           fontSize: 18,
           fontWeight: FontWeight.w500,
           color: AppColors.darkText,
         ),
-        bodyLarge: GoogleFonts.abel(
+        bodyLarge: GoogleFonts.rubik(
           fontSize: 16,
           color: AppColors.darkText,
         ),
-        bodyMedium: GoogleFonts.abel(
+        bodyMedium: GoogleFonts.rubik(
           fontSize: 14,
           color: AppColors.lightText,
         ),
-        labelLarge: GoogleFonts.abel(
+        labelLarge: GoogleFonts.rubik(
           fontSize: 16,
           fontWeight: FontWeight.w500,
           color: AppColors.white,
@@ -73,7 +73,7 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryPink,
           foregroundColor: AppColors.white,
-          textStyle: GoogleFonts.abel(
+          textStyle: GoogleFonts.rubik(
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
@@ -87,7 +87,7 @@ class AppTheme {
         backgroundColor: AppColors.creamBackground,
         foregroundColor: AppColors.darkText,
         elevation: 0,
-        titleTextStyle: GoogleFonts.abel(
+        titleTextStyle: GoogleFonts.rubik(
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: AppColors.darkText,
@@ -110,41 +110,41 @@ class AppTheme {
         onSecondary: AppColors.creamBackground,
         onSurface: AppColors.creamBackground,
       ),
-      textTheme: GoogleFonts.abelTextTheme().copyWith(
-        displayLarge: GoogleFonts.abel(
+      textTheme: GoogleFonts.rubikTextTheme().copyWith(
+        displayLarge: GoogleFonts.rubik(
           fontSize: 32,
           fontWeight: FontWeight.bold,
           color: AppColors.creamBackground,
         ),
-        displayMedium: GoogleFonts.abel(
+        displayMedium: GoogleFonts.rubik(
           fontSize: 28,
           fontWeight: FontWeight.bold,
           color: AppColors.creamBackground,
         ),
-        headlineLarge: GoogleFonts.abel(
+        headlineLarge: GoogleFonts.rubik(
           fontSize: 24,
           fontWeight: FontWeight.w600,
           color: AppColors.creamBackground,
         ),
-        headlineMedium: GoogleFonts.abel(
+        headlineMedium: GoogleFonts.rubik(
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: AppColors.creamBackground,
         ),
-        titleLarge: GoogleFonts.abel(
+        titleLarge: GoogleFonts.rubik(
           fontSize: 18,
           fontWeight: FontWeight.w500,
           color: AppColors.creamBackground,
         ),
-        bodyLarge: GoogleFonts.abel(
+        bodyLarge: GoogleFonts.rubik(
           fontSize: 16,
           color: AppColors.creamBackground,
         ),
-        bodyMedium: GoogleFonts.abel(
+        bodyMedium: GoogleFonts.rubik(
           fontSize: 14,
           color: AppColors.creamBackground,
         ),
-        labelLarge: GoogleFonts.abel(
+        labelLarge: GoogleFonts.rubik(
           fontSize: 16,
           fontWeight: FontWeight.w500,
           color: AppColors.white,
@@ -154,7 +154,7 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryPink,
           foregroundColor: AppColors.white,
-          textStyle: GoogleFonts.abel(
+          textStyle: GoogleFonts.rubik(
             fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
@@ -168,7 +168,7 @@ class AppTheme {
         backgroundColor: AppColors.darkBackground,
         foregroundColor: AppColors.creamBackground,
         elevation: 0,
-        titleTextStyle: GoogleFonts.abel(
+        titleTextStyle: GoogleFonts.rubik(
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: AppColors.creamBackground,

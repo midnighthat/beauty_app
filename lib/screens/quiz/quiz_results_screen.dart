@@ -4,6 +4,7 @@ import '../../themes/app_theme.dart';
 import '../../widgets/common/index.dart';
 import '../../models/quiz_models.dart';
 import '../../providers/skin_profile_provider.dart';
+import '../../services/preferences_service.dart';
 
 class QuizResultsScreen extends ConsumerStatefulWidget {
   final SkinProfile skinProfile;
@@ -27,9 +28,10 @@ class _QuizResultsScreenState extends ConsumerState<QuizResultsScreen>
   void initState() {
     super.initState();
     
-    // Save the skin profile to provider (fallback if accessed directly)
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    // Save the skin profile to provider and persistent storage
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       ref.read(skinProfileProvider.notifier).state = widget.skinProfile;
+      await PreferencesService.setSkinProfile(widget.skinProfile);
     });
     
     _tabController = TabController(length: 4, vsync: this);

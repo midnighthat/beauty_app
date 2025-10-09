@@ -149,7 +149,7 @@ class ProfileTab extends ConsumerWidget {
             ),
             
             _buildMenuItem(
-              icon: Icons.notifications_outline,
+              icon: Icons.notifications_outlined,
               title: 'Notifications',
               onTap: () {
                 // TODO: Implement notifications

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/skin_profile_provider.dart';
 import '../../screens/splash_screen.dart';
 import '../../screens/onboarding/onboarding_screen.dart';
 import '../../screens/auth/sign_in_screen.dart';
+import '../../screens/quiz/skin_quiz_screen.dart';
 import '../../screens/main/main_navigation_screen.dart';
 import '../../services/preferences_service.dart';
 
@@ -16,20 +18,32 @@ class AuthWrapper extends ConsumerStatefulWidget {
 
 class _AuthWrapperState extends ConsumerState<AuthWrapper> {
   bool? _hasSeenOnboarding;
+  bool? _hasCompletedQuiz;
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _checkOnboardingStatus();
+    _checkAppStatus();
   }
 
-  void _checkOnboardingStatus() async {
+  void _checkAppStatus() async {
     try {
       final hasSeenOnboarding = await PreferencesService.getHasSeenOnboarding();
+      final hasCompletedQuiz = await PreferencesService.getHasCompletedQuiz();
+      
+      // Load saved skin profile if exists
+      if (hasCompletedQuiz) {
+        final savedProfile = await PreferencesService.getSkinProfile();
+        if (savedProfile != null && mounted) {
+          ref.read(skinProfileProvider.notifier).state = savedProfile;
+        }
+      }
+      
       if (mounted) {
         setState(() {
           _hasSeenOnboarding = hasSeenOnboarding;
+          _hasCompletedQuiz = hasCompletedQuiz;
           _isLoading = false;
         });
       }
@@ -37,6 +51,7 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
       if (mounted) {
         setState(() {
           _hasSeenOnboarding = false;
+          _hasCompletedQuiz = false;
           _isLoading = false;
         });
       }
@@ -56,8 +71,14 @@ class _AuthWrapperState extends ConsumerState<AuthWrapper> {
       data: (state) {
         switch (state) {
           case AuthState.authenticated:
-            // User is signed in, go directly to main app
-            return const MainNavigationScreen();
+            // User is signed in, check if they've completed the quiz
+            if (_hasCompletedQuiz == true) {
+              // User has completed quiz, go to main app
+              return const MainNavigationScreen();
+            } else {
+              // User hasn't completed quiz, send to quiz screen
+              return const SkinQuizScreen();
+            }
           case AuthState.unauthenticated:
             // User is not signed in
             if (_hasSeenOnboarding == true) {
