@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../themes/app_theme.dart';
 import '../../widgets/common/index.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/budget_provider.dart';
+import '../../providers/currency_provider.dart';
 
 class CartScreen extends ConsumerStatefulWidget {
   const CartScreen({super.key});
@@ -18,7 +20,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cartItems = ref.watch(cartProvider);
-    final cartTotal = ref.watch(cartTotalProvider);
+    final usdCartTotal = ref.watch(cartTotalProvider);
+    final currency = ref.watch(currencyProvider);
+    final convertedCartTotal = CurrencyUtils.convertPrice(usdCartTotal, currency);
+    final formattedCartTotal = CurrencyUtils.formatPrice(convertedCartTotal, currency);
     
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.creamBackground,
@@ -34,8 +39,8 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    AppColors.primaryPink,
-                    AppColors.primaryPink.withOpacity(0.8),
+                    AppColors.primaryBrown,
+                    AppColors.primaryBrown.withOpacity(0.8),
                   ],
                 ),
                 borderRadius: const BorderRadius.only(
@@ -67,12 +72,15 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                         fontSize: 24,
                       ),
                       TitleText(
-                        '\$${cartTotal.toStringAsFixed(2)}',
+                        formattedCartTotal,
                         color: AppColors.white,
                         fontSize: 24,
                       ),
                     ],
                   ),
+                  
+                  // Budget Progress Section
+                  _buildBudgetProgress(ref, convertedCartTotal),
                 ],
               ),
             ),
@@ -87,7 +95,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                           Icon(
                             Icons.shopping_cart_outlined,
                             size: 64,
-                            color: AppColors.primaryPink.withOpacity(0.5),
+                            color: AppColors.primaryBrown.withOpacity(0.5),
                           ),
                           const SizedBox(height: 16),
                           CustomText(
@@ -170,7 +178,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: AppColors.primaryPink.withOpacity(0.1),
+              color: AppColors.primaryBrown.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: ClipRRect(
@@ -182,12 +190,12 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
                           decoration: BoxDecoration(
-                            color: AppColors.primaryPink.withOpacity(0.2),
+                            color: AppColors.primaryBrown.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(
                             Icons.shopping_bag,
-                            color: AppColors.primaryPink,
+                            color: AppColors.primaryBrown,
                             size: 30,
                           ),
                         );
@@ -195,12 +203,12 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     )
                   : Container(
                       decoration: BoxDecoration(
-                        color: AppColors.primaryPink.withOpacity(0.2),
+                        color: AppColors.primaryBrown.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
                         Icons.shopping_bag,
-                        color: AppColors.primaryPink,
+                        color: AppColors.primaryBrown,
                         size: 30,
                       ),
                     ),
@@ -242,12 +250,12 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                         width: 28,
                         height: 28,
                         decoration: BoxDecoration(
-                          color: AppColors.primaryPink.withOpacity(0.1),
+                          color: AppColors.primaryBrown.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Icon(
                           Icons.remove,
-                          color: AppColors.primaryPink,
+                          color: AppColors.primaryBrown,
                           size: 16,
                         ),
                       ),
@@ -271,12 +279,12 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                         width: 28,
                         height: 28,
                         decoration: BoxDecoration(
-                          color: AppColors.primaryPink.withOpacity(0.1),
+                          color: AppColors.primaryBrown.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Icon(
                           Icons.add,
-                          color: AppColors.primaryPink,
+                          color: AppColors.primaryBrown,
                           size: 16,
                         ),
                       ),
@@ -291,26 +299,140 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              if (item.salePrice != null) ...[
-                CustomText(
-                  '\$${item.salePrice!.toStringAsFixed(2)}',
-                  type: TextType.bodyLarge,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primaryPink,
+              Consumer(
+                builder: (context, ref, child) {
+                  final currency = ref.watch(currencyProvider);
+                  if (item.salePrice != null) {
+                    final convertedSalePrice = CurrencyUtils.convertPrice(item.salePrice!, currency);
+                    final convertedPrice = CurrencyUtils.convertPrice(item.price, currency);
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        CustomText(
+                          CurrencyUtils.formatPrice(convertedSalePrice, currency),
+                          type: TextType.bodyLarge,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primaryBrown,
+                        ),
+                        CustomText(
+                          CurrencyUtils.formatPrice(convertedPrice, currency),
+                          type: TextType.caption,
+                          color: AppColors.lightText,
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                      ],
+                    );
+                  } else {
+                    final convertedPrice = CurrencyUtils.convertPrice(item.price, currency);
+                    return CustomText(
+                      CurrencyUtils.formatPrice(convertedPrice, currency),
+                      type: TextType.bodyLarge,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primaryBrown,
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBudgetProgress(WidgetRef ref, double cartTotal) {
+    final budgetProfile = ref.watch(budgetProfileProvider);
+    final hasBudget = ref.watch(hasBudgetSetupProvider);
+    final currency = ref.watch(currencyProvider);
+    
+    if (!hasBudget || budgetProfile == null) {
+      return const SizedBox(); // Don't show if no budget set
+    }
+    
+    // Convert budget amounts to selected currency for display
+    final convertedMonthlyBudget = CurrencyUtils.convertPrice(budgetProfile.monthlyBudget, currency);
+    final convertedCurrentSpent = CurrencyUtils.convertPrice(budgetProfile.currentMonthSpent, currency);
+    
+    final potentialNewSpent = convertedCurrentSpent + cartTotal;
+    final remainingBudget = convertedMonthlyBudget - potentialNewSpent;
+    final progressPercentage = (potentialNewSpent / convertedMonthlyBudget * 100).clamp(0, 100);
+    final isOverBudget = potentialNewSpent > convertedMonthlyBudget;
+    
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Monthly Budget',
+                style: TextStyle(
+                  color: AppColors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
                 ),
-                CustomText(
-                  '\$${item.price.toStringAsFixed(2)}',
-                  type: TextType.caption,
-                  color: AppColors.lightText,
-                  decoration: TextDecoration.lineThrough,
+              ),
+              Text(
+                isOverBudget 
+                  ? 'Over by ${CurrencyUtils.formatPrice((potentialNewSpent - convertedMonthlyBudget), currency)}'
+                  : '${CurrencyUtils.formatPrice(remainingBudget, currency)} left',
+                style: TextStyle(
+                  color: isOverBudget ? Colors.red.shade300 : AppColors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
                 ),
-              ] else
-                CustomText(
-                  '\$${item.price.toStringAsFixed(2)}',
-                  type: TextType.bodyLarge,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primaryPink,
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          
+          // Progress Bar
+          Container(
+            height: 6,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(3),
+              color: AppColors.white.withOpacity(0.3),
+            ),
+            child: Stack(
+              children: [
+                FractionallySizedBox(
+                  widthFactor: (progressPercentage / 100).clamp(0.0, 1.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(3),
+                      color: isOverBudget 
+                        ? Colors.red.shade300
+                        : progressPercentage >= 80 
+                          ? Colors.orange.shade300
+                          : AppColors.white,
+                    ),
+                  ),
                 ),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 4),
+          
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${CurrencyUtils.formatPrice(potentialNewSpent, currency)} spent',
+                style: TextStyle(
+                  color: AppColors.white.withOpacity(0.8),
+                  fontSize: 12,
+                ),
+              ),
+              Text(
+                '${CurrencyUtils.formatPrice(convertedMonthlyBudget, currency)} budget',
+                style: TextStyle(
+                  color: AppColors.white.withOpacity(0.8),
+                  fontSize: 12,
+                ),
+              ),
             ],
           ),
         ],
@@ -468,7 +590,7 @@ class _PaymentDrawerState extends ConsumerState<PaymentDrawer> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primaryPink,
+                              color: AppColors.primaryBrown,
                             ),
                           ),
                         ),
@@ -510,7 +632,7 @@ class _PaymentDrawerState extends ConsumerState<PaymentDrawer> {
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: const BorderSide(
-                              color: AppColors.primaryPink,
+                              color: AppColors.primaryBrown,
                             ),
                           ),
                         ),
@@ -563,7 +685,7 @@ class _PaymentDrawerState extends ConsumerState<PaymentDrawer> {
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
                                       borderSide: const BorderSide(
-                                        color: AppColors.primaryPink,
+                                        color: AppColors.primaryBrown,
                                       ),
                                     ),
                                   ),
@@ -617,7 +739,7 @@ class _PaymentDrawerState extends ConsumerState<PaymentDrawer> {
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
                                       borderSide: const BorderSide(
-                                        color: AppColors.primaryPink,
+                                        color: AppColors.primaryBrown,
                                       ),
                                     ),
                                   ),
@@ -640,7 +762,7 @@ class _PaymentDrawerState extends ConsumerState<PaymentDrawer> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryPink.withOpacity(0.1),
+                          color: AppColors.primaryBrown.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
@@ -652,11 +774,19 @@ class _PaymentDrawerState extends ConsumerState<PaymentDrawer> {
                               fontWeight: FontWeight.w600,
                               color: isDark ? AppColors.creamBackground : AppColors.darkText,
                             ),
-                            CustomText(
-                              '\$238.00',
-                              type: TextType.bodyLarge,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primaryPink,
+                            Consumer(
+                              builder: (context, ref, child) {
+                                final usdCartTotal = ref.watch(cartTotalProvider);
+                                final currency = ref.watch(currencyProvider);
+                                final convertedCartTotal = CurrencyUtils.convertPrice(usdCartTotal, currency);
+                                final formattedCartTotal = CurrencyUtils.formatPrice(convertedCartTotal, currency);
+                                return CustomText(
+                                  formattedCartTotal,
+                                  type: TextType.bodyLarge,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.primaryBrown,
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -691,14 +821,14 @@ class _PaymentDrawerState extends ConsumerState<PaymentDrawer> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            AppColors.primaryPink,
+            AppColors.primaryBrown,
             Color(0xFFE91E63),
           ],
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryPink.withOpacity(0.3),
+            color: AppColors.primaryBrown.withOpacity(0.3),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -834,19 +964,19 @@ class _PaymentDrawerState extends ConsumerState<PaymentDrawer> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: AppColors.primaryPink.withOpacity(0.1),
+                color: AppColors.primaryBrown.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.check,
                 size: 40,
-                color: AppColors.primaryPink,
+                color: AppColors.primaryBrown,
               ),
             ),
             const SizedBox(height: 24),
             const TitleText(
               'Payment Successful!',
-              color: AppColors.primaryPink,
+              color: AppColors.primaryBrown,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),

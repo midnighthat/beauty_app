@@ -1,14 +1,18 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../models/product_models.dart';
 
 class SephoraApiService {
   static const String _baseUrl = 'https://sephora.p.rapidapi.com/us/products/v2/list';
   static const String _categoriesUrl = 'https://sephora.p.rapidapi.com/categories/v2/list-root';
-  static const String _apiKey = '8b7b562f00msh2545b5cd0eb8e40p17a880jsn755f8249e12f';
-  static const String _apiHost = 'sephora.p.rapidapi.com';
+  static const String _productDetailsUrl = 'https://sephora.p.rapidapi.com/us/products/v2/detail';
+  
+  // Get API credentials from environment variables
+  static String get _apiKey => dotenv.env['SEPHORA_API_KEY'] ?? '';
+  static String get _apiHost => dotenv.env['SEPHORA_API_HOST'] ?? 'sephora.p.rapidapi.com';
 
-  static const Map<String, String> _headers = {
+  static Map<String, String> get _headers => {
     'x-rapidapi-key': _apiKey,
     'x-rapidapi-host': _apiHost,
   };
@@ -127,6 +131,7 @@ class SephoraApiService {
   static Map<String, dynamic> productToFirebaseJson(Product product) {
     return {
       'id': product.productId,
+      'skuId': product.currentSku.skuId, // Add skuId for product details API
       'brand': product.brandName,
       'name': product.displayName,
       'image': product.heroImage,
@@ -142,6 +147,37 @@ class SephoraApiService {
       'targetUrl': product.targetUrl,
       'createdAt': DateTime.now().toIso8601String(),
     };
+  }
+
+  /// Fetch detailed product information
+  static Future<Map<String, dynamic>?> fetchProductDetails(String productId, String preferredSku) async {
+    final uri = Uri.parse(_productDetailsUrl).replace(queryParameters: {
+      'productId': productId,
+      'preferedSku': preferredSku, // Note: API uses "prefered" not "preferred"
+    });
+
+    try {
+      print('🔍 Fetching product details for ID: $productId, SKU: $preferredSku');
+      
+      final response = await http.get(uri, headers: _headers);
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        print('✅ Product details fetched successfully');
+        
+        // Log the structure for debugging
+        print('📝 Product details structure: ${jsonData.keys}');
+        
+        return jsonData;
+      } else {
+        print('❌ Failed to load product details: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        throw Exception('Failed to load product details: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ Network error fetching product details: $e');
+      throw Exception('Network error: $e');
+    }
   }
 
   static double _extractPrice(String priceString) {

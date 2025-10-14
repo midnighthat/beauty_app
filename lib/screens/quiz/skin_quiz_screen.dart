@@ -123,7 +123,7 @@ class _SkinQuizScreenState extends ConsumerState<SkinQuizScreen>
         elevation: 0,
         leading: _currentQuestionIndex > 0 
             ? IconButton(
-                icon: const Icon(Icons.arrow_back, color: AppColors.primaryPink),
+                icon: const Icon(Icons.arrow_back, color: AppColors.primaryBrown),
                 onPressed: _previousQuestion,
               )
             : null,
@@ -151,8 +151,8 @@ class _SkinQuizScreenState extends ConsumerState<SkinQuizScreen>
                   const SizedBox(height: 8),
                   LinearProgressIndicator(
                     value: _progress,
-                    backgroundColor: AppColors.primaryPink.withOpacity(0.2),
-                    valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primaryPink),
+                    backgroundColor: AppColors.primaryBrown.withOpacity(0.2),
+                    valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primaryBrown),
                     minHeight: 6,
                   ),
                 ],
@@ -180,13 +180,13 @@ class _SkinQuizScreenState extends ConsumerState<SkinQuizScreen>
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primaryPink.withOpacity(0.1),
+                                  color: AppColors.primaryBrown.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: CustomText(
                                   'Q${_currentQuestionIndex + 1}',
                                   type: TextType.labelMedium,
-                                  color: AppColors.primaryPink,
+                                  color: AppColors.primaryBrown,
                                 ),
                               ),
                               
@@ -216,11 +216,11 @@ class _SkinQuizScreenState extends ConsumerState<SkinQuizScreen>
                                         padding: const EdgeInsets.all(16),
                                         decoration: BoxDecoration(
                                           color: isSelected
-                                              ? AppColors.primaryPink.withOpacity(0.1)
+                                              ? AppColors.primaryBrown.withOpacity(0.1)
                                               : Colors.transparent,
                                           border: Border.all(
                                             color: isSelected
-                                                ? AppColors.primaryPink
+                                                ? AppColors.primaryBrown
                                                 : (isDark ? AppColors.creamBackground.withOpacity(0.3) : AppColors.lightText.withOpacity(0.3)),
                                             width: isSelected ? 2 : 1,
                                           ),
@@ -235,12 +235,12 @@ class _SkinQuizScreenState extends ConsumerState<SkinQuizScreen>
                                                 shape: BoxShape.circle,
                                                 border: Border.all(
                                                   color: isSelected
-                                                      ? AppColors.primaryPink
+                                                      ? AppColors.primaryBrown
                                                       : (isDark ? AppColors.creamBackground.withOpacity(0.5) : AppColors.lightText.withOpacity(0.5)),
                                                   width: 2,
                                                 ),
                                                 color: isSelected
-                                                    ? AppColors.primaryPink
+                                                    ? AppColors.primaryBrown
                                                     : Colors.transparent,
                                               ),
                                               child: isSelected
@@ -256,7 +256,7 @@ class _SkinQuizScreenState extends ConsumerState<SkinQuizScreen>
                                               child: BodyText(
                                                 option.text,
                                                 color: isSelected
-                                                    ? AppColors.primaryPink
+                                                    ? AppColors.primaryBrown
                                                     : (isDark ? AppColors.creamBackground : AppColors.darkText),
                                               ),
                                             ),

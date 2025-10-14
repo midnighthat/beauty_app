@@ -75,7 +75,7 @@ class _IslandTabBarState extends State<IslandTabBar>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     
     return Container(
       margin: const EdgeInsets.all(20),
@@ -90,10 +90,10 @@ class _IslandTabBarState extends State<IslandTabBar>
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    AppColors.primaryPink,
+                    AppColors.primaryBrown,
                     Color.lerp(
-                      AppColors.primaryPink.withOpacity(0.8),
-                      AppColors.primaryPink,
+                      AppColors.primaryBrown.withOpacity(0.8),
+                      AppColors.primaryBrown,
                       _backgroundAnimation.value * 0.3,
                     )!,
                   ],
@@ -101,7 +101,7 @@ class _IslandTabBarState extends State<IslandTabBar>
                 borderRadius: BorderRadius.circular(35),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primaryPink.withOpacity(0.4),
+                    color: AppColors.primaryBrown.withOpacity(0.4),
                     blurRadius: 15,
                     offset: const Offset(0, 5),
                   ),

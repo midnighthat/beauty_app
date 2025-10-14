@@ -29,7 +29,7 @@ class _BookingTabState extends ConsumerState<BookingTab> {
             width: double.infinity,
             padding: const EdgeInsets.only(top: 50, bottom: 20, left: 20, right: 20),
             decoration: const BoxDecoration(
-              color: AppColors.primaryPink,
+              color: AppColors.primaryBrown,
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(30),
                 bottomRight: Radius.circular(30),
@@ -98,7 +98,7 @@ class _BookingTabState extends ConsumerState<BookingTab> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              icon: const Icon(Icons.chevron_left, color: AppColors.primaryPink),
+              icon: const Icon(Icons.chevron_left, color: AppColors.primaryBrown),
               onPressed: () {
                 setState(() {
                   selectedDate = DateTime(selectedDate.year, selectedDate.month - 1);
@@ -112,7 +112,7 @@ class _BookingTabState extends ConsumerState<BookingTab> {
                   : AppColors.darkText,
             ),
             IconButton(
-              icon: const Icon(Icons.chevron_right, color: AppColors.primaryPink),
+              icon: const Icon(Icons.chevron_right, color: AppColors.primaryBrown),
               onPressed: () {
                 setState(() {
                   selectedDate = DateTime(selectedDate.year, selectedDate.month + 1);
@@ -134,7 +134,6 @@ class _BookingTabState extends ConsumerState<BookingTab> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final today = DateTime.now();
     final firstDayOfMonth = DateTime(selectedDate.year, selectedDate.month, 1);
-    final lastDayOfMonth = DateTime(selectedDate.year, selectedDate.month + 1, 0);
     final startDate = firstDayOfMonth.subtract(Duration(days: firstDayOfMonth.weekday % 7));
     
     return GridView.builder(
@@ -186,7 +185,7 @@ class _BookingTabState extends ConsumerState<BookingTab> {
                     width: 20,
                     height: 3,
                     decoration: BoxDecoration(
-                      color: AppColors.primaryPink,
+                      color: AppColors.primaryBrown,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -215,7 +214,7 @@ class _BookingTabState extends ConsumerState<BookingTab> {
               child: const CustomText(
                 'See All',
                 type: TextType.bodyMedium,
-                color: AppColors.primaryPink,
+                color: AppColors.primaryBrown,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -262,11 +261,11 @@ class _BookingTabState extends ConsumerState<BookingTab> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isSelected 
-              ? AppColors.primaryPink.withOpacity(0.1) 
+              ? AppColors.primaryBrown.withOpacity(0.1) 
               : Colors.transparent,
           border: Border.all(
             color: isSelected 
-                ? AppColors.primaryPink 
+                ? AppColors.primaryBrown 
                 : AppColors.lightText.withOpacity(0.3),
             width: isSelected ? 2 : 1,
           ),
@@ -281,7 +280,7 @@ class _BookingTabState extends ConsumerState<BookingTab> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? AppColors.primaryPink : Colors.transparent,
+                  color: isSelected ? AppColors.primaryBrown : Colors.transparent,
                   width: 2,
                 ),
               ),
@@ -298,11 +297,11 @@ class _BookingTabState extends ConsumerState<BookingTab> {
                       height: 60,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: AppColors.primaryPink.withOpacity(0.2),
+                        color: AppColors.primaryBrown.withOpacity(0.2),
                       ),
                       child: const Icon(
                         Icons.person,
-                        color: AppColors.primaryPink,
+                        color: AppColors.primaryBrown,
                         size: 30,
                       ),
                     );
@@ -380,14 +379,14 @@ class _BookingTabState extends ConsumerState<BookingTab> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: isSelected 
-                      ? AppColors.primaryPink 
-                      : AppColors.primaryPink.withOpacity(0.1),
+                      ? AppColors.primaryBrown 
+                      : AppColors.primaryBrown.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: CustomText(
                   time,
                   type: TextType.bodySmall,
-                  color: isSelected ? AppColors.white : AppColors.primaryPink,
+                  color: isSelected ? AppColors.white : AppColors.primaryBrown,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -413,13 +412,13 @@ class _BookingTabState extends ConsumerState<BookingTab> {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: AppColors.primaryPink.withOpacity(0.1),
+            color: AppColors.primaryBrown.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: appointmentFor,
-              icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.primaryPink),
+              icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.primaryBrown),
               dropdownColor: isDark ? AppColors.darkSurface : AppColors.white,
               items: ['Myself', 'Family Member', 'Friend'].map((String value) {
                 return DropdownMenuItem<String>(
@@ -453,7 +452,7 @@ class _BookingTabState extends ConsumerState<BookingTab> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Appointment booked successfully!'),
-            backgroundColor: AppColors.primaryPink,
+            backgroundColor: AppColors.primaryBrown,
           ),
         );
       },

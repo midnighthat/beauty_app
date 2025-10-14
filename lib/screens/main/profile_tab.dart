@@ -4,7 +4,9 @@ import '../../themes/app_theme.dart';
 import '../../widgets/common/index.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/skin_profile_provider.dart';
+import '../../providers/currency_provider.dart';
 import '../../services/preferences_service.dart';
+import '../profile/liked_products_screen.dart';
 
 class ProfileTab extends ConsumerWidget {
   const ProfileTab({super.key});
@@ -49,7 +51,7 @@ class ProfileTab extends ConsumerWidget {
                   height: 120,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.primaryPink.withOpacity(0.2),
+                    color: AppColors.primaryBrown.withOpacity(0.2),
                   ),
                   child: user?.photoURL != null
                       ? ClipRRect(
@@ -64,7 +66,7 @@ class ProfileTab extends ConsumerWidget {
                       : const Icon(
                           Icons.person,
                           size: 60,
-                          color: AppColors.primaryPink,
+                          color: AppColors.primaryBrown,
                         ),
                 ),
                 // Edit icon
@@ -75,7 +77,7 @@ class ProfileTab extends ConsumerWidget {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: AppColors.primaryPink,
+                      color: AppColors.primaryBrown,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isDark ? AppColors.darkBackground : AppColors.creamBackground,
@@ -107,10 +109,10 @@ class ProfileTab extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.primaryPink.withOpacity(0.1),
+                color: AppColors.primaryBrown.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: AppColors.primaryPink.withOpacity(0.3),
+                  color: AppColors.primaryBrown.withOpacity(0.3),
                   width: 1,
                 ),
               ),
@@ -121,7 +123,7 @@ class ProfileTab extends ConsumerWidget {
                     width: 8,
                     height: 8,
                     decoration: const BoxDecoration(
-                      color: AppColors.primaryPink,
+                      color: AppColors.primaryBrown,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -129,7 +131,7 @@ class ProfileTab extends ConsumerWidget {
                   CustomText(
                     profile?.skinType ?? 'Normal Skin',
                     type: TextType.bodyMedium,
-                    color: AppColors.primaryPink,
+                    color: AppColors.primaryBrown,
                     fontWeight: FontWeight.w500,
                   ),
                 ],
@@ -165,6 +167,20 @@ class ProfileTab extends ConsumerWidget {
             ),
             
             _buildMenuItem(
+              icon: Icons.favorite,
+              title: 'Liked Products',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LikedProductsScreen(),
+                  ),
+                );
+              },
+              isDark: isDark,
+            ),
+            
+            _buildMenuItem(
               icon: Icons.history,
               title: 'Order History',
               onTap: () {
@@ -181,6 +197,8 @@ class ProfileTab extends ConsumerWidget {
               },
               isDark: isDark,
             ),
+            
+            _buildCurrencyMenuItem(context, ref, isDark),
             
             const SizedBox(height: 40),
             
@@ -216,19 +234,19 @@ class ProfileTab extends ConsumerWidget {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: AppColors.primaryPink.withOpacity(0.1),
+                        color: AppColors.primaryBrown.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
                         Icons.logout,
-                        color: AppColors.primaryPink,
+                        color: AppColors.primaryBrown,
                         size: 20,
                       ),
                     ),
                     const SizedBox(width: 16),
                     TitleText(
                       'Sign Out',
-                      color: AppColors.primaryPink,
+                      color: AppColors.primaryBrown,
                     ),
                   ],
                 ),
@@ -259,12 +277,12 @@ class ProfileTab extends ConsumerWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppColors.primaryPink.withOpacity(0.1),
+                color: AppColors.primaryBrown.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
-                color: AppColors.primaryPink,
+                color: AppColors.primaryBrown,
                 size: 20,
               ),
             ),
@@ -280,6 +298,177 @@ class ProfileTab extends ConsumerWidget {
               size: 16,
               color: isDark ? AppColors.creamBackground.withOpacity(0.5) : AppColors.lightText,
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCurrencyMenuItem(BuildContext context, WidgetRef ref, bool isDark) {
+    final currentCurrency = ref.watch(currencyProvider);
+    
+    return GestureDetector(
+      onTap: () {
+        _showCurrencyDialog(context, ref, isDark);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.primaryBrown.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.attach_money,
+                color: AppColors.primaryBrown,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TitleText(
+                    'Currency',
+                    color: isDark ? AppColors.creamBackground : AppColors.darkText,
+                  ),
+                  const SizedBox(height: 2),
+                  CustomText(
+                    currentCurrency == 'USD' ? 'US Dollar (USD)' : 'UAE Dirham (AED)',
+                    type: TextType.bodySmall,
+                    color: isDark ? AppColors.creamBackground.withOpacity(0.7) : AppColors.lightText,
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: isDark ? AppColors.creamBackground.withOpacity(0.5) : AppColors.lightText,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showCurrencyDialog(BuildContext context, WidgetRef ref, bool isDark) {
+    final currentCurrency = ref.read(currencyProvider);
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: isDark ? AppColors.darkSurface : AppColors.white,
+          title: TitleText(
+            'Select Currency',
+            color: isDark ? AppColors.creamBackground : AppColors.darkText,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildCurrencyOption(
+                'USD',
+                'US Dollar',
+                '\$',
+                currentCurrency == 'USD',
+                () {
+                  ref.read(currencyProvider.notifier).setCurrency('USD');
+                  Navigator.of(context).pop();
+                },
+                isDark,
+              ),
+              const SizedBox(height: 12),
+              _buildCurrencyOption(
+                'AED',
+                'UAE Dirham',
+                'AED',
+                currentCurrency == 'AED',
+                () {
+                  ref.read(currencyProvider.notifier).setCurrency('AED');
+                  Navigator.of(context).pop();
+                },
+                isDark,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildCurrencyOption(
+    String code,
+    String name,
+    String symbol,
+    bool isSelected,
+    VoidCallback onTap,
+    bool isDark,
+  ) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected 
+            ? AppColors.primaryBrown.withOpacity(0.1)
+            : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected 
+              ? AppColors.primaryBrown
+              : (isDark ? AppColors.creamBackground.withOpacity(0.2) : AppColors.lightText.withOpacity(0.2)),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                color: AppColors.primaryBrown.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: CustomText(
+                  symbol,
+                  type: TextType.bodySmall,
+                  color: AppColors.primaryBrown,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CustomText(
+                    name,
+                    type: TextType.bodyMedium,
+                    color: isDark ? AppColors.creamBackground : AppColors.darkText,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  CustomText(
+                    code,
+                    type: TextType.bodySmall,
+                    color: isDark ? AppColors.creamBackground.withOpacity(0.7) : AppColors.lightText,
+                  ),
+                ],
+              ),
+            ),
+            if (isSelected)
+              const Icon(
+                Icons.check_circle,
+                color: AppColors.primaryBrown,
+                size: 20,
+              ),
           ],
         ),
       ),

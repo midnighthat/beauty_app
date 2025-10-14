@@ -19,7 +19,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final List<OnboardingData> _onboardingData = [
     OnboardingData(
       image: 'assets/images/onboarding-1.png',
-      title: 'Welcome to Skin Care',
+      title: 'Welcome to Hanglow',
       subtitle: 'Your Personal Beauty Assistant',
       description: 'Get personalized skincare recommendations powered by AI. Discover products that work best for your unique skin type.',
     ),
@@ -115,8 +115,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         height: 8,
                         decoration: BoxDecoration(
                           color: _currentPage == index
-                              ? AppColors.primaryPink
-                              : AppColors.primaryPink.withOpacity(0.3),
+                              ? AppColors.primaryBrown
+                              : AppColors.primaryBrown.withOpacity(0.3),
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),

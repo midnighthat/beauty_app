@@ -82,7 +82,7 @@ class _SkinStatBarState extends State<SkinStatBar>
                       builder: (context, child) {
                         return CaptionText(
                           '${(_animation.value * 100).round()}%',
-                          color: widget.color ?? AppColors.primaryPink,
+                          color: widget.color ?? AppColors.primaryBrown,
                         );
                       },
                     ),
@@ -92,7 +92,7 @@ class _SkinStatBarState extends State<SkinStatBar>
                 Container(
                   height: 6,
                   decoration: BoxDecoration(
-                    color: (widget.color ?? AppColors.primaryPink).withOpacity(0.2),
+                    color: (widget.color ?? AppColors.primaryBrown).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(3),
                   ),
                   child: AnimatedBuilder(
@@ -103,7 +103,7 @@ class _SkinStatBarState extends State<SkinStatBar>
                         alignment: Alignment.centerLeft,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: widget.color ?? AppColors.primaryPink,
+                            color: widget.color ?? AppColors.primaryBrown,
                             borderRadius: BorderRadius.circular(3),
                           ),
                         ),

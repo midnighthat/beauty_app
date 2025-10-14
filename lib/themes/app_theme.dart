@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  static const Color primaryPink = Color(0xFFEC82B0);
-  static const Color creamBackground = Color(0xFFFEF8F1);
+  static const Color primaryBrown = Color(0xFF773301);
+  static const Color creamBackground = Color(0xFFFEF6E9);
   static const Color white = Color(0xFFFFFFFF);
   static const Color darkText = Color(0xFF2D2D2D);
   static const Color lightText = Color(0xFF6B6B6B);
@@ -12,6 +12,9 @@ class AppColors {
   static const Color darkBackground = Color(0xFF1A1A1A);
   static const Color darkSurface = Color(0xFF2D2D2D);
   static const Color darkCream = Color(0xFF2A1F1A);
+  
+  // Legacy alias for compatibility
+  static const Color primaryPink = primaryBrown;
 }
 
 class AppTheme {
@@ -19,10 +22,10 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      primaryColor: AppColors.primaryPink,
+      primaryColor: AppColors.primaryBrown,
       scaffoldBackgroundColor: AppColors.creamBackground,
       colorScheme: const ColorScheme.light(
-        primary: AppColors.primaryPink,
+        primary: AppColors.primaryBrown,
         secondary: AppColors.creamBackground,
         surface: AppColors.creamBackground,
         onPrimary: AppColors.white,
@@ -71,7 +74,7 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryPink,
+          backgroundColor: AppColors.primaryBrown,
           foregroundColor: AppColors.white,
           textStyle: GoogleFonts.rubik(
             fontSize: 16,
@@ -100,10 +103,10 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      primaryColor: AppColors.primaryPink,
+      primaryColor: AppColors.primaryBrown,
       scaffoldBackgroundColor: AppColors.darkBackground,
       colorScheme: const ColorScheme.dark(
-        primary: AppColors.primaryPink,
+        primary: AppColors.primaryBrown,
         secondary: AppColors.darkCream,
         surface: AppColors.darkBackground,
         onPrimary: AppColors.white,
@@ -152,7 +155,7 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryPink,
+          backgroundColor: AppColors.primaryBrown,
           foregroundColor: AppColors.white,
           textStyle: GoogleFonts.rubik(
             fontSize: 16,

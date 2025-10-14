@@ -78,7 +78,7 @@ class _QuizResultsScreenState extends ConsumerState<QuizResultsScreen>
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.home, color: AppColors.primaryPink),
+            icon: const Icon(Icons.home, color: AppColors.primaryBrown),
             onPressed: () => Navigator.pushNamedAndRemoveUntil(
               context, 
               '/main', 
@@ -100,7 +100,7 @@ class _QuizResultsScreenState extends ConsumerState<QuizResultsScreen>
                   child: CustomCard(
                     type: CardType.elevated,
                     size: CardSize.large,
-                    backgroundColor: AppColors.primaryPink.withOpacity(0.05),
+                    backgroundColor: AppColors.primaryBrown.withOpacity(0.05),
                     child: Column(
                       children: [
                         // Skin type badge
@@ -109,8 +109,8 @@ class _QuizResultsScreenState extends ConsumerState<QuizResultsScreen>
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                AppColors.primaryPink,
-                                AppColors.primaryPink.withOpacity(0.8),
+                                AppColors.primaryBrown,
+                                AppColors.primaryBrown.withOpacity(0.8),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(25),
@@ -149,16 +149,16 @@ class _QuizResultsScreenState extends ConsumerState<QuizResultsScreen>
                               return Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primaryPink.withOpacity(0.1),
+                                  color: AppColors.primaryBrown.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
-                                    color: AppColors.primaryPink.withOpacity(0.3),
+                                    color: AppColors.primaryBrown.withOpacity(0.3),
                                   ),
                                 ),
                                 child: CustomText(
                                   concern,
                                   type: TextType.bodySmall,
-                                  color: AppColors.primaryPink,
+                                  color: AppColors.primaryBrown,
                                 ),
                               );
                             }).toList(),
@@ -181,7 +181,7 @@ class _QuizResultsScreenState extends ConsumerState<QuizResultsScreen>
                   child: SecondaryButton(
                     text: 'Book Consultation',
                     onPressed: _bookConsultation,
-                    icon: const Icon(Icons.calendar_today, color: AppColors.primaryPink),
+                    icon: const Icon(Icons.calendar_today, color: AppColors.primaryBrown),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -206,7 +206,7 @@ class _QuizResultsScreenState extends ConsumerState<QuizResultsScreen>
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryPink.withOpacity(0.1),
+                  color: AppColors.primaryBrown.withOpacity(0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 5),
                 ),
@@ -214,8 +214,8 @@ class _QuizResultsScreenState extends ConsumerState<QuizResultsScreen>
             ),
             child: TabBar(
               controller: _tabController,
-              indicatorColor: AppColors.primaryPink,
-              labelColor: AppColors.primaryPink,
+              indicatorColor: AppColors.primaryBrown,
+              labelColor: AppColors.primaryBrown,
               unselectedLabelColor: AppColors.lightText,
               indicatorSize: TabBarIndicatorSize.tab,
               dividerColor: Colors.transparent,
@@ -271,7 +271,7 @@ class _QuizResultsScreenState extends ConsumerState<QuizResultsScreen>
                         width: 32,
                         height: 32,
                         decoration: BoxDecoration(
-                          color: AppColors.primaryPink,
+                          color: AppColors.primaryBrown,
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Center(
@@ -300,7 +300,7 @@ class _QuizResultsScreenState extends ConsumerState<QuizResultsScreen>
                               CustomText(
                                 'Example: ${step.productExample}',
                                 type: TextType.bodySmall,
-                                color: AppColors.primaryPink,
+                                color: AppColors.primaryBrown,
                                 fontWeight: FontWeight.w500,
                               ),
                             ],
@@ -343,10 +343,10 @@ class _QuizResultsScreenState extends ConsumerState<QuizResultsScreen>
                   margin: const EdgeInsets.only(bottom: 16),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppColors.primaryPink.withOpacity(0.05),
+                    color: AppColors.primaryBrown.withOpacity(0.05),
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: AppColors.primaryPink.withOpacity(0.2),
+                      color: AppColors.primaryBrown.withOpacity(0.2),
                     ),
                   ),
                   child: Column(
@@ -361,7 +361,7 @@ class _QuizResultsScreenState extends ConsumerState<QuizResultsScreen>
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: AppColors.primaryPink,
+                              color: AppColors.primaryBrown,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: CustomText(
@@ -379,7 +379,7 @@ class _QuizResultsScreenState extends ConsumerState<QuizResultsScreen>
                       CustomText(
                         'Frequency: ${treatment.frequency}',
                         type: TextType.bodySmall,
-                        color: AppColors.primaryPink,
+                        color: AppColors.primaryBrown,
                         fontWeight: FontWeight.w500,
                       ),
                       const SizedBox(height: 8),
@@ -393,7 +393,7 @@ class _QuizResultsScreenState extends ConsumerState<QuizResultsScreen>
                               color: AppColors.white,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: AppColors.primaryPink.withOpacity(0.3),
+                                color: AppColors.primaryBrown.withOpacity(0.3),
                               ),
                             ),
                             child: CustomText(

@@ -85,7 +85,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primaryPink.withOpacity(0.3),
+                            color: AppColors.primaryBrown.withOpacity(0.3),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
@@ -108,7 +108,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     SubheadingText(
                       'Skin Love Starts Here',
                       textAlign: TextAlign.center,
-                      color: isDark ? AppColors.creamBackground.withOpacity(0.8) : AppColors.primaryPink,
+                      color: isDark ? AppColors.creamBackground.withOpacity(0.8) : AppColors.primaryBrown,
                     ),
                     
                     const SizedBox(height: 40),
@@ -117,7 +117,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     const CustomLoading(
                       type: LoadingType.circular,
                       size: LoadingSize.medium,
-                      color: AppColors.primaryPink,
+                      color: AppColors.primaryBrown,
                     ),
                   ],
                 ),

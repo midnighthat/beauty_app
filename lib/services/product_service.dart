@@ -6,11 +6,13 @@ class ProductService {
 
   // Collection references
   static const String _productsCollection = 'products';
+  static const String _productDetailsCollection = 'product_details';
   static const String _categoriesCollection = 'categories';
   static const String _metadataCollection = 'metadata';
 
   /// ONE-TIME: Load categories and products from Sephora API to Firebase
   /// Call this once during development to populate your database
+  /// Updated to include skuId field for product details API
   static Future<void> loadProductsToFirebase() async {
     try {
       print('🚀 Starting product import from Sephora API...');
@@ -189,5 +191,154 @@ class ProductService {
       return data;
     }
     return null;
+  }
+
+  /// Get detailed product information (Firebase first, API fallback)
+  static Future<Map<String, dynamic>?> getProductDetails(String productId, String preferredSku) async {
+    try {
+      // First try to get from Firebase cache
+      final cachedDetails = await _getCachedProductDetails(productId);
+      if (cachedDetails != null) {
+        print('✅ Using cached product details for $productId');
+        return cachedDetails;
+      }
+
+      // If not cached, fetch from API
+      print('🔍 Fetching fresh product details from API for $productId');
+      final apiDetails = await SephoraApiService.fetchProductDetails(productId, preferredSku);
+      
+      if (apiDetails != null) {
+        // Cache the result for future use
+        await _cacheProductDetails(productId, preferredSku, apiDetails);
+        return apiDetails;
+      }
+      
+      return null;
+    } catch (e) {
+      print('❌ Failed to fetch product details: $e');
+      return null;
+    }
+  }
+
+  /// Get cached product details from Firebase
+  static Future<Map<String, dynamic>?> _getCachedProductDetails(String productId) async {
+    try {
+      final doc = await _firestore
+          .collection(_productDetailsCollection)
+          .doc(productId)
+          .get();
+      
+      if (doc.exists) {
+        final data = doc.data()!;
+        // Check if cache is not too old (e.g., 7 days)
+        final cachedAt = DateTime.parse(data['cachedAt']);
+        final isStale = DateTime.now().difference(cachedAt).inDays > 7;
+        
+        if (!isStale) {
+          return data['details'] as Map<String, dynamic>;
+        } else {
+          print('⚠️ Cached data is stale for $productId, will fetch fresh data');
+        }
+      }
+      return null;
+    } catch (e) {
+      print('❌ Error reading cached product details: $e');
+      return null;
+    }
+  }
+
+  /// Cache product details in Firebase
+  static Future<void> _cacheProductDetails(String productId, String skuId, Map<String, dynamic> details) async {
+    try {
+      await _firestore.collection(_productDetailsCollection).doc(productId).set({
+        'productId': productId,
+        'skuId': skuId,
+        'details': details,
+        'cachedAt': DateTime.now().toIso8601String(),
+        'lastUpdated': DateTime.now().toIso8601String(),
+      });
+      print('✅ Cached product details for $productId');
+    } catch (e) {
+      print('❌ Failed to cache product details: $e');
+      // Don't throw error - caching failure shouldn't break the app
+    }
+  }
+
+  /// ONE-TIME: Bulk import product details for all products
+  static Future<void> loadProductDetailsToFirebase() async {
+    try {
+      print('🚀 Starting bulk product details import...');
+      
+      // Get all products from Firebase
+      final productsSnapshot = await _firestore.collection(_productsCollection).get();
+      final products = productsSnapshot.docs;
+      
+      print('📊 Found ${products.length} products to process');
+      
+      int processed = 0;
+      int cached = 0;
+      int errors = 0;
+      
+      for (final productDoc in products) {
+        try {
+          final productData = productDoc.data();
+          final productId = productData['id'];
+          final skuId = productData['skuId'];
+          
+          if (productId != null && skuId != null) {
+            // Check if already cached
+            final existingCache = await _getCachedProductDetails(productId);
+            if (existingCache != null) {
+              print('⏭️ Skipping $productId (already cached)');
+              processed++;
+              continue;
+            }
+            
+            print('🔍 Fetching details for $productId...');
+            final details = await SephoraApiService.fetchProductDetails(productId, skuId);
+            
+            if (details != null) {
+              await _cacheProductDetails(productId, skuId, details);
+              cached++;
+              print('✅ Cached details for $productId');
+            } else {
+              print('⚠️ No details found for $productId');
+            }
+            
+            // Rate limiting - wait between requests
+            await Future.delayed(const Duration(milliseconds: 1000));
+          }
+          
+          processed++;
+          if (processed % 10 == 0) {
+            print('📈 Progress: $processed/${products.length} processed, $cached cached, $errors errors');
+          }
+          
+        } catch (e) {
+          errors++;
+          print('❌ Error processing product ${productDoc.id}: $e');
+          // Continue with next product
+        }
+      }
+      
+      // Update metadata
+      await _firestore.collection(_metadataCollection).doc('product_details_import').set({
+        'lastImport': DateTime.now().toIso8601String(),
+        'totalProcessed': processed,
+        'totalCached': cached,
+        'totalErrors': errors,
+        'importedBy': 'bulk_import_v1',
+      });
+      
+      print('✅ Bulk import completed!');
+      print('📊 Final stats:');
+      print('   - Processed: $processed');
+      print('   - Cached: $cached');
+      print('   - Errors: $errors');
+      
+    } catch (e) {
+      print('❌ Bulk import failed: $e');
+      rethrow;
+    }
   }
 }

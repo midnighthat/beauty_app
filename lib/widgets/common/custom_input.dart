@@ -96,7 +96,7 @@ class _CustomInputState extends State<CustomInput> {
             borderRadius: BorderRadius.circular(12),
             boxShadow: _isFocused ? [
               BoxShadow(
-                color: AppColors.primaryPink.withOpacity(0.2),
+                color: AppColors.primaryBrown.withOpacity(0.2),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -184,7 +184,7 @@ class _CustomInputState extends State<CustomInput> {
       borderRadius: BorderRadius.circular(12),
       borderSide: BorderSide(
         color: isFocused 
-            ? AppColors.primaryPink
+            ? AppColors.primaryBrown
             : (isDark 
                 ? AppColors.creamBackground.withOpacity(0.2)
                 : AppColors.lightText.withOpacity(0.3)),
@@ -208,17 +208,17 @@ class _CustomInputState extends State<CustomInput> {
       case InputType.email:
         return Icon(
           Icons.email_outlined,
-          color: _isFocused ? AppColors.primaryPink : AppColors.lightText,
+          color: _isFocused ? AppColors.primaryBrown : AppColors.lightText,
         );
       case InputType.password:
         return Icon(
           Icons.lock_outlined,
-          color: _isFocused ? AppColors.primaryPink : AppColors.lightText,
+          color: _isFocused ? AppColors.primaryBrown : AppColors.lightText,
         );
       case InputType.search:
         return Icon(
           Icons.search,
-          color: _isFocused ? AppColors.primaryPink : AppColors.lightText,
+          color: _isFocused ? AppColors.primaryBrown : AppColors.lightText,
         );
       default:
         return null;
@@ -230,7 +230,7 @@ class _CustomInputState extends State<CustomInput> {
       return IconButton(
         icon: Icon(
           _obscureText ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-          color: _isFocused ? AppColors.primaryPink : AppColors.lightText,
+          color: _isFocused ? AppColors.primaryBrown : AppColors.lightText,
         ),
         onPressed: () {
           setState(() {
@@ -381,7 +381,7 @@ class MessageInput extends StatelessWidget {
       suffixIcon: IconButton(
         icon: const Icon(
           Icons.send,
-          color: AppColors.primaryPink,
+          color: AppColors.primaryBrown,
         ),
         onPressed: onSend,
       ),

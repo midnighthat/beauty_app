@@ -1,11 +1,11 @@
 {
-    "name": "Beauty Care",
-    "short_name": "Beauty Care",
+    "name": "Hanglow",
+    "short_name": "Hanglow",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#fef8f1",
-    "theme_color": "#ec82b0",
-    "description": "Beauty Care - Your personal skincare assistant for discovering the perfect products.",
+    "background_color": "#FEF6E9",
+    "theme_color": "#773301",
+    "description": "Hanglow - Your personalized beauty companion for discovering the perfect products.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

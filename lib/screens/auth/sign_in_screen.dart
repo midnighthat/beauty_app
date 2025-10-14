@@ -173,7 +173,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                           },
                           child: const CaptionText(
                             'Terms of Service',
-                            color: AppColors.primaryPink,
+                            color: AppColors.primaryBrown,
                           ),
                         ),
                         const CaptionText(' and '),
@@ -183,7 +183,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                           },
                           child: const CaptionText(
                             'Privacy Policy',
-                            color: AppColors.primaryPink,
+                            color: AppColors.primaryBrown,
                           ),
                         ),
                       ],

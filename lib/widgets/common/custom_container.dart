@@ -88,8 +88,8 @@ class CustomContainer extends StatelessWidget {
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          AppColors.primaryPink.withOpacity(0.8),
-          AppColors.primaryPink.withOpacity(0.6),
+          AppColors.primaryBrown.withOpacity(0.8),
+          AppColors.primaryBrown.withOpacity(0.6),
         ],
       );
     }
@@ -132,7 +132,7 @@ class CustomContainer extends StatelessWidget {
       case ContainerType.rounded:
         return [
           BoxShadow(
-            color: AppColors.primaryPink.withOpacity(0.1),
+            color: AppColors.primaryBrown.withOpacity(0.1),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -140,7 +140,7 @@ class CustomContainer extends StatelessWidget {
       case ContainerType.gradient:
         return [
           BoxShadow(
-            color: AppColors.primaryPink.withOpacity(0.3),
+            color: AppColors.primaryBrown.withOpacity(0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -202,7 +202,7 @@ class ImageContainer extends StatelessWidget {
         borderRadius: BorderRadius.circular(borderRadius),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryPink.withOpacity(0.1),
+            color: AppColors.primaryBrown.withOpacity(0.1),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -284,8 +284,8 @@ class GradientContainer extends StatelessWidget {
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: colors ?? [
-          AppColors.primaryPink.withOpacity(0.8),
-          AppColors.primaryPink.withOpacity(0.6),
+          AppColors.primaryBrown.withOpacity(0.8),
+          AppColors.primaryBrown.withOpacity(0.6),
         ],
       ),
       child: child,

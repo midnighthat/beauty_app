@@ -63,7 +63,7 @@ class _CustomLoadingState extends State<CustomLoading>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final loadingColor = widget.color ?? AppColors.primaryPink;
+    final loadingColor = widget.color ?? AppColors.primaryBrown;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -278,7 +278,7 @@ class LoadingButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: isLoading ? null : onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryPink,
+        backgroundColor: AppColors.primaryBrown,
         foregroundColor: AppColors.white,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         shape: RoundedRectangleBorder(

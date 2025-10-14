@@ -82,17 +82,17 @@ class CircularProgressPainter extends CustomPainter {
 
     // Background circles
     final backgroundPaint = Paint()
-      ..color = AppColors.primaryPink.withOpacity(0.1)
+      ..color = AppColors.primaryBrown.withOpacity(0.1)
       ..strokeWidth = strokeWidth
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
 
     final values = data.values.toList();
     final colors = [
-      AppColors.primaryPink,
-      AppColors.primaryPink.withOpacity(0.8),
-      AppColors.primaryPink.withOpacity(0.6),
-      AppColors.primaryPink.withOpacity(0.4),
+      AppColors.primaryBrown,
+      AppColors.primaryBrown.withOpacity(0.8),
+      AppColors.primaryBrown.withOpacity(0.6),
+      AppColors.primaryBrown.withOpacity(0.4),
     ];
 
     // Draw background circles

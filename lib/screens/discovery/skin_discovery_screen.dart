@@ -93,7 +93,7 @@ class _SkinDiscoveryScreenState extends ConsumerState<SkinDiscoveryScreen>
                       CustomText(
                         'Skincare Journey',
                         type: TextType.displayLarge,
-                        color: AppColors.primaryPink,
+                        color: AppColors.primaryBrown,
                         fontSize: 32,
                         fontWeight: FontWeight.w300,
                       ),
@@ -159,7 +159,7 @@ class _SkinDiscoveryScreenState extends ConsumerState<SkinDiscoveryScreen>
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primaryPink.withOpacity(0.3),
+                    color: AppColors.primaryBrown.withOpacity(0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -210,8 +210,8 @@ class _SkinDiscoveryScreenState extends ConsumerState<SkinDiscoveryScreen>
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            AppColors.primaryPink.withOpacity(0.8),
-                            AppColors.primaryPink.withOpacity(0.4),
+                            AppColors.primaryBrown.withOpacity(0.8),
+                            AppColors.primaryBrown.withOpacity(0.4),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(12),
@@ -241,7 +241,7 @@ class _SkinDiscoveryScreenState extends ConsumerState<SkinDiscoveryScreen>
                         ),
                         const SizedBox(height: 4),
                         const CustomText(
-                          'Skin Care',
+                          'Hanglow',
                           type: TextType.labelMedium,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -295,16 +295,16 @@ class _SkinDiscoveryScreenState extends ConsumerState<SkinDiscoveryScreen>
             decoration: BoxDecoration(
               gradient: RadialGradient(
                 colors: [
-                  AppColors.primaryPink.withOpacity(0.6),
-                  AppColors.primaryPink.withOpacity(0.2),
-                  AppColors.primaryPink.withOpacity(0.1),
+                  AppColors.primaryBrown.withOpacity(0.6),
+                  AppColors.primaryBrown.withOpacity(0.2),
+                  AppColors.primaryBrown.withOpacity(0.1),
                 ],
                 stops: const [0.0, 0.7, 1.0],
               ),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryPink.withOpacity(0.3),
+                  color: AppColors.primaryBrown.withOpacity(0.3),
                   blurRadius: 15,
                   offset: const Offset(0, 5),
                 ),

@@ -39,7 +39,7 @@ class CustomCard extends StatelessWidget {
         color: _getBackgroundColor(isDark),
         borderRadius: BorderRadius.circular(borderRadius ?? _getBorderRadius()),
         elevation: _getElevation(),
-        shadowColor: showShadow ? AppColors.primaryPink.withOpacity(0.1) : Colors.transparent,
+        shadowColor: showShadow ? AppColors.primaryBrown.withOpacity(0.1) : Colors.transparent,
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(borderRadius ?? _getBorderRadius()),
@@ -198,7 +198,7 @@ class MessageCard extends StatelessWidget {
       size: CardSize.small,
       margin: margin,
       backgroundColor: isUser 
-          ? AppColors.primaryPink.withOpacity(0.1)
+          ? AppColors.primaryBrown.withOpacity(0.1)
           : (isDark ? AppColors.darkSurface : AppColors.white),
       borderRadius: 16,
       child: child,

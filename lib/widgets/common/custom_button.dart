@@ -84,8 +84,8 @@ class CustomButton extends StatelessWidget {
 
     switch (type) {
       case ButtonType.primary:
-        backgroundColor = AppColors.primaryPink;
-        borderColor = AppColors.primaryPink;
+        backgroundColor = AppColors.primaryBrown;
+        borderColor = AppColors.primaryBrown;
         elevation = 2;
         break;
       case ButtonType.secondary:
@@ -95,7 +95,7 @@ class CustomButton extends StatelessWidget {
         break;
       case ButtonType.outline:
         backgroundColor = Colors.transparent;
-        borderColor = AppColors.primaryPink;
+        borderColor = AppColors.primaryBrown;
         elevation = 0;
         break;
       case ButtonType.text:
@@ -109,7 +109,7 @@ class CustomButton extends StatelessWidget {
       backgroundColor: backgroundColor,
       foregroundColor: _getTextColor(theme, isDark),
       elevation: elevation,
-      shadowColor: AppColors.primaryPink.withOpacity(0.3),
+      shadowColor: AppColors.primaryBrown.withOpacity(0.3),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(_getBorderRadius()),
         side: BorderSide(color: borderColor, width: type == ButtonType.outline ? 2 : 0),
@@ -126,7 +126,7 @@ class CustomButton extends StatelessWidget {
         return isDark ? AppColors.creamBackground : AppColors.darkText;
       case ButtonType.outline:
       case ButtonType.text:
-        return AppColors.primaryPink;
+        return AppColors.primaryBrown;
     }
   }
 
