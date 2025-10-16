@@ -215,6 +215,7 @@ class BodyText extends StatelessWidget {
   final TextAlign? textAlign;
   final int? maxLines;
   final double? height;
+  final FontWeight? fontWeight;
 
   const BodyText(
     this.text, {
@@ -223,6 +224,7 @@ class BodyText extends StatelessWidget {
     this.textAlign,
     this.maxLines,
     this.height,
+    this.fontWeight,
   });
 
   @override
@@ -234,6 +236,7 @@ class BodyText extends StatelessWidget {
       textAlign: textAlign,
       maxLines: maxLines,
       height: height ?? 1.6,
+      fontWeight: fontWeight,
     );
   }
 }
@@ -243,6 +246,7 @@ class CaptionText extends StatelessWidget {
   final Color? color;
   final TextAlign? textAlign;
   final int? maxLines;
+  final FontWeight? fontWeight;
 
   const CaptionText(
     this.text, {
@@ -250,6 +254,7 @@ class CaptionText extends StatelessWidget {
     this.color,
     this.textAlign,
     this.maxLines,
+    this.fontWeight,
   });
 
   @override
@@ -260,6 +265,7 @@ class CaptionText extends StatelessWidget {
       color: color,
       textAlign: textAlign,
       maxLines: maxLines,
+      fontWeight: fontWeight,
     );
   }
 }

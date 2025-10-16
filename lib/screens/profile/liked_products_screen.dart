@@ -4,7 +4,7 @@ import '../../themes/app_theme.dart';
 import '../../providers/favorites_provider.dart';
 import '../../providers/currency_provider.dart';
 import '../../services/product_service.dart';
-import '../products/product_detail_screen.dart';
+import '../product/product_details_screen.dart';
 
 class LikedProductsScreen extends ConsumerWidget {
   const LikedProductsScreen({super.key});
@@ -110,7 +110,7 @@ class LikedProductsScreen extends ConsumerWidget {
 
   Widget _buildProductsList(List<String> favoriteIds, bool isDark) {
     return StreamBuilder<List<Map<String, dynamic>>>(
-      stream: ProductService.getProductsByCategory('cat150006'), // Default to face products
+      stream: ProductService.getProductsByCategory('All'), // Load all products to find favorites
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
@@ -120,7 +120,7 @@ class LikedProductsScreen extends ConsumerWidget {
 
         final allProducts = snapshot.data ?? [];
         final likedProducts = allProducts.where((product) {
-          final productId = product['id'] ?? product['productId'] ?? '';
+          final productId = (product['id'] ?? product['productId'] ?? '').toString();
           return favoriteIds.contains(productId);
         }).toList();
 
@@ -149,14 +149,14 @@ class LikedProductsScreen extends ConsumerWidget {
         final usdPrice = double.tryParse(product['price']?.toString() ?? '0') ?? 0.0;
         final convertedPrice = CurrencyUtils.convertPrice(usdPrice, currency);
         final formattedPrice = CurrencyUtils.formatPrice(convertedPrice, currency);
-        final productId = product['id'] ?? product['productId'] ?? '';
+        final productId = (product['id'] ?? product['productId'] ?? '').toString();
         
         return GestureDetector(
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ProductDetailScreen(product: product),
+                builder: (context) => ProductDetailsScreen(productId: product['id'].toString()),
               ),
             );
           },
@@ -191,9 +191,9 @@ class LikedProductsScreen extends ConsumerWidget {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: product['image'] != null
-                        ? Image.network(
-                            product['image'],
+                    child: product['images'] != null
+                        ? Image.asset(
+                            product['images'],
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return Icon(

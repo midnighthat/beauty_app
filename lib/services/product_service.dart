@@ -1,344 +1,348 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'sephora_api_service.dart';
+import 'dart:convert';
+import 'package:flutter/services.dart';
+import '../models/product_models.dart';
 
 class ProductService {
-  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  // Simple memory cache to avoid reloading during same session
+  static KBeautyData? _memoryCache;
+  static DateTime? _cacheTime;
+  static const cacheDuration = Duration(minutes: 5); // Cache for 5 minutes
 
-  // Collection references
-  static const String _productsCollection = 'products';
-  static const String _productDetailsCollection = 'product_details';
-  static const String _categoriesCollection = 'categories';
-  static const String _metadataCollection = 'metadata';
-
-  /// ONE-TIME: Load categories and products from Sephora API to Firebase
-  /// Call this once during development to populate your database
-  /// Updated to include skuId field for product details API
-  static Future<void> loadProductsToFirebase() async {
+  /// Load K-beauty data from unified JSON file
+  static Future<KBeautyData> _loadKBeautyData() async {
+    // Check memory cache first
+    if (_memoryCache != null && _cacheTime != null) {
+      final cacheAge = DateTime.now().difference(_cacheTime!);
+      if (cacheAge < cacheDuration) {
+        print('Using memory cached K-beauty data (${cacheAge.inSeconds}s old)');
+        return _memoryCache!;
+      }
+    }
     try {
-      print('🚀 Starting product import from Sephora API...');
+      print('Loading K-beauty data from assets/data/kbeauty_data.json');
+      final String jsonString = await rootBundle.loadString('assets/data/kbeauty_data.json');
+      print('JSON string length: ${jsonString.length}');
       
-      // Fetch all categories and products from API
-      final allData = await SephoraApiService.fetchAllCategoriesAndProducts();
-      final categories = allData['categories'] as List<dynamic>;
-      final allProducts = allData['products'] as Map<String, dynamic>;
+      final Map<String, dynamic> jsonData = json.decode(jsonString);
+      print('JSON decoded successfully');
+      print('JSON keys: ${jsonData.keys.toList()}');
       
-      print('📊 Processing ${categories.length} categories...');
-      
-      // Store categories first
-      for (var category in categories) {
-        final categoryData = {
-          'id': category.categoryId,
-          'name': category.displayName,
-          'hasChildren': category.hasChildCategories,
-          'targetUrl': category.targetUrl,
-          'thumbImage': category.thumbImage,
-          'selectedThumbImage': category.selectedThumbImage,
-          'showInApp': category.showInAppJaBsDropdown,
-          'lastUpdated': DateTime.now().toIso8601String(),
-        };
-        
-        await _firestore
-            .collection(_categoriesCollection)
-            .doc(category.categoryId)
-            .set(categoryData);
-        
-        print('✅ Saved category: ${category.displayName}');
+      final kbeautyData = KBeautyData.fromJson(jsonData);
+      print('K-beauty data parsed successfully!');
+      print('Treatments count: ${kbeautyData.treatments.length}');
+      print('Products count: ${kbeautyData.products.length}');
+      if (kbeautyData.treatments.isNotEmpty) {
+        print('First treatment: ${kbeautyData.treatments.first.name}');
       }
       
-      // Store products by category
-      for (String categoryId in allProducts.keys) {
-        final categoryData = allProducts[categoryId];
-        final categoryName = categories
-            .firstWhere((cat) => cat.categoryId == categoryId)
-            .displayName;
-        
-        print('📦 Importing ${categoryData.products.length} products for $categoryName');
-        
-        // Create batch for efficient writes
-        WriteBatch batch = _firestore.batch();
-        int batchCount = 0;
-        
-        for (var product in categoryData.products) {
-          final productJson = SephoraApiService.productToFirebaseJson(product);
-          productJson['categoryId'] = categoryId;
-          productJson['categoryName'] = categoryName;
-          
-          final docRef = _firestore
-              .collection(_productsCollection)
-              .doc(product.productId);
-          
-          batch.set(docRef, productJson);
-          batchCount++;
-          
-          // Commit batch every 500 writes (Firestore limit)
-          if (batchCount >= 500) {
-            await batch.commit();
-            batch = _firestore.batch();
-            batchCount = 0;
-          }
-        }
-        
-        // Commit remaining writes
-        if (batchCount > 0) {
-          await batch.commit();
-        }
-        
-        // Update category with product count
-        await _firestore
-            .collection(_categoriesCollection)
-            .doc(categoryId)
-            .update({
-          'productCount': categoryData.products.length,
-        });
-      }
+      // Cache the data
+      _memoryCache = kbeautyData;
+      _cacheTime = DateTime.now();
       
-      // Store import metadata
-      await _firestore.collection(_metadataCollection).doc('import_info').set({
-        'lastImport': DateTime.now().toIso8601String(),
-        'totalCategories': categories.length,
-        'totalProducts': allProducts.values.fold<int>(0, (total, cat) => total + (cat.products.length as int)),
-        'importedBy': 'sephora_api_v2',
-      });
-      
-      print('✅ Import completed successfully!');
-      print('📊 Final stats:');
-      print('   - Categories: ${categories.length}');
-      print('   - Total products: ${allProducts.values.fold<int>(0, (total, cat) => total + (cat.products.length as int))}');
-      
-    } catch (e) {
-      print('❌ Import failed: $e');
-      rethrow;
+      return kbeautyData;
+    } catch (e, stackTrace) {
+      print('Error loading K-beauty data: $e');
+      print('Stack trace: $stackTrace');
+      // Return empty data if file doesn't exist
+      return const KBeautyData(
+        skinTypes: [],
+        categories: [],
+        products: [],
+        treatments: [],
+      );
     }
   }
 
-  /// Get products by category from Firebase
-  static Stream<List<Map<String, dynamic>>> getProductsByCategory(String categoryId) {
-    return _firestore
-        .collection(_productsCollection)
-        .where('categoryId', isEqualTo: categoryId)
-        .limit(50)
-        .snapshots()
-        .map((snapshot) {
-          final docs = snapshot.docs.map((doc) {
-            final data = doc.data();
-            data['id'] = doc.id; // Include document ID
-            return data;
-          }).toList();
-          
-          // Sort by rating in memory (temporary solution)
-          docs.sort((a, b) {
-            final ratingA = (a['rating'] as num?) ?? 0;
-            final ratingB = (b['rating'] as num?) ?? 0;
-            return ratingB.compareTo(ratingA); // Descending order
-          });
-          
-          return docs;
-        });
+  /// Load mock products from JSON file
+  static Future<List<Map<String, dynamic>>> _loadMockProducts() async {
+    try {
+      final kbeautyData = await _loadKBeautyData();
+      return kbeautyData.products.map((product) {
+        final productMap = product.toJson();
+        // Override with correct image path
+        productMap['images'] = _getProductImagePath(product.id);
+        return productMap;
+      }).toList();
+    } catch (e) {
+      print('Error loading mock products: $e');
+      // Return empty list if file doesn't exist yet
+      return [];
+    }
+  }
+
+  /// Load mock categories from JSON file
+  static Future<List<String>> _loadMockCategories() async {
+    try {
+      final kbeautyData = await _loadKBeautyData();
+      return kbeautyData.categories;
+    } catch (e) {
+      print('Error loading mock categories: $e');
+      // Return default categories if file doesn't exist yet
+      return _getDefaultCategories();
+    }
+  }
+
+  /// Load mock treatments from JSON file
+  static Future<List<Map<String, dynamic>>> _loadMockTreatments() async {
+    try {
+      final kbeautyData = await _loadKBeautyData();
+      return kbeautyData.treatments.map((treatment) => treatment.toJson()).toList();
+    } catch (e) {
+      print('Error loading mock treatments: $e');
+      return [];
+    }
+  }
+
+  /// Get default categories for initial setup
+  static List<String> _getDefaultCategories() {
+    return [
+      'Cleanser',
+      'Moisturizer',
+      'Sunscreen',
+      'Serum',
+      'Toner',
+      'Exfoliator',
+      'Face Mask'
+    ];
+  }
+
+  /// Get products by category from JSON mock data
+  static Stream<List<Map<String, dynamic>>> getProductsByCategory(String categoryId) async* {
+    final products = await _loadMockProducts();
+    
+    // Handle "All" category to show all products
+    List<Map<String, dynamic>> filteredProducts;
+    if (categoryId == 'All') {
+      filteredProducts = products;
+    } else {
+      filteredProducts = products
+          .where((product) => product['categories'] == categoryId)
+          .toList();
+    }
+    
+    // Sort by rating in descending order
+    filteredProducts.sort((a, b) {
+      final ratingA = (a['rating'] as num?) ?? 0;
+      final ratingB = (b['rating'] as num?) ?? 0;
+      return ratingB.compareTo(ratingA);
+    });
+    
+    yield filteredProducts;
   }
 
   /// Get all categories
-  static Stream<List<Map<String, dynamic>>> getCategories() {
-    return _firestore
-        .collection(_categoriesCollection)
-        .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) {
-              final data = doc.data();
-              data['key'] = doc.id; // Include document ID as key
-              return data;
-            }).toList());
+  static Stream<List<Map<String, dynamic>>> getCategories() async* {
+    final categories = await _loadMockCategories();
+    final categoryData = categories.map((category) => {
+      'id': category.toLowerCase(),
+      'key': category.toLowerCase(),
+      'name': category,
+      'hasChildren': false,
+      'targetUrl': '/category/${category.toLowerCase()}',
+      'thumbImage': 'https://via.placeholder.com/150x150/8B4513/FFFFFF?text=${Uri.encodeComponent(category)}',
+      'selectedThumbImage': 'https://via.placeholder.com/150x150/A0522D/FFFFFF?text=${Uri.encodeComponent(category)}',
+      'showInApp': true,
+      'productCount': 0, // Could be calculated dynamically if needed
+    }).toList();
+    
+    yield categoryData;
   }
 
   /// Search products
-  static Stream<List<Map<String, dynamic>>> searchProducts(String query) {
-    return _firestore
-        .collection(_productsCollection)
-        .where('name', isGreaterThanOrEqualTo: query)
-        .where('name', isLessThanOrEqualTo: '$query\uf8ff')
-        .limit(20)
-        .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) {
-              final data = doc.data();
-              data['id'] = doc.id;
-              return data;
-            }).toList());
+  static Stream<List<Map<String, dynamic>>> searchProducts(String query) async* {
+    final products = await _loadMockProducts();
+    final searchResults = products
+        .where((product) {
+          final name = (product['name'] ?? '').toString().toLowerCase();
+          final description = (product['description'] ?? '').toString().toLowerCase();
+          final searchQuery = query.toLowerCase();
+          return name.contains(searchQuery) || description.contains(searchQuery);
+        })
+        .take(20)
+        .toList();
+    
+    yield searchResults;
   }
 
-  /// Get featured products (high rated + exclusive)
-  static Stream<List<Map<String, dynamic>>> getFeaturedProducts() {
-    return _firestore
-        .collection(_productsCollection)
-        .where('rating', isGreaterThan: 4.0)
-        .orderBy('rating', descending: true)
-        .limit(10)
-        .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) {
-              final data = doc.data();
-              data['id'] = doc.id;
-              return data;
-            }).toList());
+  /// Get featured products (high rated)
+  static Stream<List<Map<String, dynamic>>> getFeaturedProducts() async* {
+    final products = await _loadMockProducts();
+    final featuredProducts = products
+        .where((product) {
+          final rating = (product['rating'] as num?) ?? 0;
+          return rating >= 4.5;
+        })
+        .take(10)
+        .toList();
+    
+    // Sort by rating in descending order
+    featuredProducts.sort((a, b) {
+      final ratingA = (a['rating'] as num?) ?? 0;
+      final ratingB = (b['rating'] as num?) ?? 0;
+      return ratingB.compareTo(ratingA);
+    });
+    
+    yield featuredProducts;
   }
 
   /// Get product by ID
   static Future<Map<String, dynamic>?> getProductById(String productId) async {
-    final doc = await _firestore
-        .collection(_productsCollection)
-        .doc(productId)
-        .get();
+    final products = await _loadMockProducts();
+    try {
+      // Convert productId to int if needed
+      final id = int.tryParse(productId) ?? productId;
+      return products.firstWhere((product) => product['id'] == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Get the correct image path for a product ID
+  static String _getProductImagePath(int productId) {
+    // Map of product IDs to their actual file extensions
+    const imageExtensions = {
+      1: 'jpeg', 2: 'jpeg', 3: 'jpeg', 4: 'jpeg', 5: 'jpeg',
+      6: 'png', 7: 'png', 8: 'jpeg', 9: 'jpeg', 10: 'jpeg',
+      101: 'JPG', 102: 'JPG', 103: 'JPG', 104: 'JPG', 105: 'JPG', 106: 'JPG', 107: 'JPG',
+      108: 'WEBP', 109: 'WEBP',
+      201: 'JPG', 202: 'JPG', 203: 'WEBP', 204: 'JPG', 205: 'JPG', 206: 'JPG',
+      301: 'AVIF', 302: 'JPG', 303: 'JPG', 304: 'JPG', 305: 'JPG', 306: 'JPG',
+      401: 'JPG', 402: 'JPG', 403: 'JPG', 404: 'JPG', 405: 'JPG',
+      501: 'jpeg', 502: 'jpeg', 503: 'JPG', 504: 'jpeg', 505: 'JPG', 506: 'jpeg',
+      601: 'AVIF', 602: 'JPG', 603: 'JPG', 604: 'JPG', 605: 'JPG', 606: 'JPG',
+      701: 'JPG', 702: 'JPG', 703: 'JPG', 704: 'JPG', 705: 'png', 706: 'WEBP',
+    };
     
-    if (doc.exists) {
-      final data = doc.data()!;
-      data['id'] = doc.id;
-      return data;
+    final extension = imageExtensions[productId] ?? 'jpeg';
+    return 'assets/images/Product-$productId.$extension';
+  }
+
+  /// Get detailed product information
+  static Future<Map<String, dynamic>?> getProductDetails(String productId, String preferredSku) async {
+    final product = await getProductById(productId);
+    if (product != null) {
+      final id = product['id'] as int;
+      final imagePath = _getProductImagePath(id);
+      
+      // Return the product data as-is since it already contains detailed information
+      return {
+        ...product,
+        'detailedDescription': product['description'],
+        'ingredients': product['ingredient'] ?? [],
+        'heroImage': imagePath,
+        'altImage': imagePath,
+        'images': imagePath, // Override with correct path
+        'displayName': product['name'],
+        'brandName': 'K-Beauty Pro', // Default brand name
+        'reviews': '${(product['rating'] as num? ?? 4.0) * 20}', // Mock review count
+        'targetUrl': '/product/${product['name']?.toString().toLowerCase().replaceAll(' ', '-')}',
+        'currentSku': {
+          'skuId': 'sku_${product['id']}',
+          'listPrice': product['price']?.toString() ?? '0.00',
+          'salePrice': null,
+          'valuePrice': null,
+          'imageAltText': product['name'] ?? 'Product Image',
+          'isNew': false,
+          'isOnlineOnly': false,
+          'isSephoraExclusive': false,
+          'isLimitedEdition': false,
+        },
+        'sponsored': false,
+      };
     }
     return null;
   }
 
-  /// Get detailed product information (Firebase first, API fallback)
-  static Future<Map<String, dynamic>?> getProductDetails(String productId, String preferredSku) async {
-    try {
-      // First try to get from Firebase cache
-      final cachedDetails = await _getCachedProductDetails(productId);
-      if (cachedDetails != null) {
-        print('✅ Using cached product details for $productId');
-        return cachedDetails;
-      }
+  /// Get all treatments
+  static Stream<List<Map<String, dynamic>>> getTreatments() async* {
+    final treatments = await _loadMockTreatments();
+    yield treatments;
+  }
 
-      // If not cached, fetch from API
-      print('🔍 Fetching fresh product details from API for $productId');
-      final apiDetails = await SephoraApiService.fetchProductDetails(productId, preferredSku);
-      
-      if (apiDetails != null) {
-        // Cache the result for future use
-        await _cacheProductDetails(productId, preferredSku, apiDetails);
-        return apiDetails;
-      }
-      
-      return null;
+  /// Get treatment by ID
+  static Future<Map<String, dynamic>?> getTreatmentById(String treatmentId) async {
+    final treatments = await _loadMockTreatments();
+    try {
+      final id = int.tryParse(treatmentId) ?? treatmentId;
+      return treatments.firstWhere((treatment) => treatment['id'] == id);
     } catch (e) {
-      print('❌ Failed to fetch product details: $e');
       return null;
     }
   }
 
-  /// Get cached product details from Firebase
-  static Future<Map<String, dynamic>?> _getCachedProductDetails(String productId) async {
-    try {
-      final doc = await _firestore
-          .collection(_productDetailsCollection)
-          .doc(productId)
-          .get();
-      
-      if (doc.exists) {
-        final data = doc.data()!;
-        // Check if cache is not too old (e.g., 7 days)
-        final cachedAt = DateTime.parse(data['cachedAt']);
-        final isStale = DateTime.now().difference(cachedAt).inDays > 7;
-        
-        if (!isStale) {
-          return data['details'] as Map<String, dynamic>;
-        } else {
-          print('⚠️ Cached data is stale for $productId, will fetch fresh data');
-        }
-      }
-      return null;
-    } catch (e) {
-      print('❌ Error reading cached product details: $e');
-      return null;
-    }
+  /// Get treatments by skin concern
+  static Stream<List<Map<String, dynamic>>> getTreatmentsByConcern(String concern) async* {
+    final treatments = await _loadMockTreatments();
+    final filteredTreatments = treatments
+        .where((treatment) => 
+          treatment['skinConcern']?.toString().toLowerCase().contains(concern.toLowerCase()) == true ||
+          treatment['bestFor']?.toString().toLowerCase().contains(concern.toLowerCase()) == true)
+        .toList();
+    
+    yield filteredTreatments;
   }
 
-  /// Cache product details in Firebase
-  static Future<void> _cacheProductDetails(String productId, String skuId, Map<String, dynamic> details) async {
-    try {
-      await _firestore.collection(_productDetailsCollection).doc(productId).set({
-        'productId': productId,
-        'skuId': skuId,
-        'details': details,
-        'cachedAt': DateTime.now().toIso8601String(),
-        'lastUpdated': DateTime.now().toIso8601String(),
-      });
-      print('✅ Cached product details for $productId');
-    } catch (e) {
-      print('❌ Failed to cache product details: $e');
-      // Don't throw error - caching failure shouldn't break the app
-    }
+  /// Get products for a specific treatment
+  static Future<List<Map<String, dynamic>>> getProductsForTreatment(int treatmentId) async {
+    final treatment = await getTreatmentById(treatmentId.toString());
+    if (treatment == null) return [];
+
+    final recommendedProductIds = (treatment['recommendedProducts'] as List<dynamic>?)?.cast<int>() ?? [];
+    final products = await _loadMockProducts();
+    
+    return products
+        .where((product) => recommendedProductIds.contains(product['id']))
+        .toList();
   }
 
-  /// ONE-TIME: Bulk import product details for all products
-  static Future<void> loadProductDetailsToFirebase() async {
-    try {
-      print('🚀 Starting bulk product details import...');
-      
-      // Get all products from Firebase
-      final productsSnapshot = await _firestore.collection(_productsCollection).get();
-      final products = productsSnapshot.docs;
-      
-      print('📊 Found ${products.length} products to process');
-      
-      int processed = 0;
-      int cached = 0;
-      int errors = 0;
-      
-      for (final productDoc in products) {
-        try {
-          final productData = productDoc.data();
-          final productId = productData['id'];
-          final skuId = productData['skuId'];
-          
-          if (productId != null && skuId != null) {
-            // Check if already cached
-            final existingCache = await _getCachedProductDetails(productId);
-            if (existingCache != null) {
-              print('⏭️ Skipping $productId (already cached)');
-              processed++;
-              continue;
-            }
-            
-            print('🔍 Fetching details for $productId...');
-            final details = await SephoraApiService.fetchProductDetails(productId, skuId);
-            
-            if (details != null) {
-              await _cacheProductDetails(productId, skuId, details);
-              cached++;
-              print('✅ Cached details for $productId');
-            } else {
-              print('⚠️ No details found for $productId');
-            }
-            
-            // Rate limiting - wait between requests
-            await Future.delayed(const Duration(milliseconds: 1000));
-          }
-          
-          processed++;
-          if (processed % 10 == 0) {
-            print('📈 Progress: $processed/${products.length} processed, $cached cached, $errors errors');
-          }
-          
-        } catch (e) {
-          errors++;
-          print('❌ Error processing product ${productDoc.id}: $e');
-          // Continue with next product
-        }
-      }
-      
-      // Update metadata
-      await _firestore.collection(_metadataCollection).doc('product_details_import').set({
-        'lastImport': DateTime.now().toIso8601String(),
-        'totalProcessed': processed,
-        'totalCached': cached,
-        'totalErrors': errors,
-        'importedBy': 'bulk_import_v1',
-      });
-      
-      print('✅ Bulk import completed!');
-      print('📊 Final stats:');
-      print('   - Processed: $processed');
-      print('   - Cached: $cached');
-      print('   - Errors: $errors');
-      
-    } catch (e) {
-      print('❌ Bulk import failed: $e');
-      rethrow;
-    }
+  // No caching needed for mock data
+
+  /// Get sample product data structure for reference
+  static Map<String, dynamic> getSampleProductStructure() {
+    return {
+      'id': 1,
+      'name': 'Sample Product Name',
+      'images': 'assets/images/product-1.jpeg',
+      'description': 'A sample product description for testing purposes.',
+      'price': 25.50,
+      'rating': 4.5,
+      'categories': 'Cleanser',
+      'ingredient': ['Water', 'Glycerin', 'Niacinamide'],
+      'skinType': 'Normal, Dry',
+      'bestFor': 'Daily Use'
+    };
+  }
+
+  /// Convert new format to legacy format for compatibility
+  static Map<String, dynamic> convertToLegacyFormat(Map<String, dynamic> product) {
+    return {
+      'id': product['id']?.toString() ?? '',
+      'productId': product['id']?.toString() ?? '',
+      'name': product['name'] ?? '',
+      'displayName': product['name'] ?? '',
+      'brandName': 'K-Beauty Pro',
+      'categoryId': product['categories']?.toString().toLowerCase() ?? '',
+      'categoryName': product['categories'] ?? '',
+      'heroImage': product['images'] ?? 'https://via.placeholder.com/300',
+      'altImage': product['images'] ?? 'https://via.placeholder.com/300',
+      'rating': product['rating']?.toString() ?? '0',
+      'reviews': '${(product['rating'] as num? ?? 4.0) * 20}',
+      'targetUrl': '/product/${product['name']?.toString().toLowerCase().replaceAll(' ', '-')}',
+      'currentSku': {
+        'skuId': 'sku_${product['id']}',
+        'listPrice': product['price']?.toString() ?? '0.00',
+        'salePrice': null,
+        'valuePrice': null,
+        'imageAltText': product['name'] ?? 'Product Image',
+        'isNew': false,
+        'isOnlineOnly': false,
+        'isSephoraExclusive': false,
+        'isLimitedEdition': false,
+      },
+      'sponsored': false,
+      'description': product['description'] ?? '',
+      'skinTypes': [product['skinType'] ?? 'All Skin Types'],
+      'concerns': [product['bestFor'] ?? ''],
+    };
   }
 }

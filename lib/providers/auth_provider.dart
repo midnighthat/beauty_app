@@ -24,6 +24,7 @@ final authStateProvider = StreamProvider<AuthState>((ref) {
   final authService = ref.read(authServiceProvider);
   
   return authService.authStateChanges.map((user) {
+    print('AuthStateProvider: User state changed - user: ${user?.email ?? 'null'}');
     if (user != null) {
       return AuthState.authenticated;
     } else {

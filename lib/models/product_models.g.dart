@@ -6,114 +6,90 @@ part of 'product_models.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Product _$ProductFromJson(Map<String, dynamic> json) => Product(
-      productId: json['productId'] as String,
-      brandName: json['brandName'] as String,
-      displayName: json['displayName'] as String,
-      heroImage: json['heroImage'] as String,
-      altImage: json['altImage'] as String?,
-      rating: json['rating'] as String,
-      reviews: json['reviews'] as String,
-      targetUrl: json['targetUrl'] as String,
-      currentSku:
-          CurrentSku.fromJson(json['currentSku'] as Map<String, dynamic>),
-      sponsored: json['sponsored'] as bool,
+KBeautyProduct _$KBeautyProductFromJson(Map<String, dynamic> json) =>
+    KBeautyProduct(
+      id: (json['id'] as num).toInt(),
+      name: json['name'] as String,
+      images: json['images'] as String,
+      description: json['description'] as String,
+      price: (json['price'] as num).toDouble(),
+      rating: (json['rating'] as num).toDouble(),
+      categories: json['categories'] as String,
+      ingredient: (json['ingredient'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
+      skinType:
+          (json['skinType'] as List<dynamic>).map((e) => e as String).toList(),
+      bestFor: json['bestFor'] as String,
+      routine: json['routine'] as String,
     );
 
-Map<String, dynamic> _$ProductToJson(Product instance) => <String, dynamic>{
-      'productId': instance.productId,
-      'brandName': instance.brandName,
-      'displayName': instance.displayName,
-      'heroImage': instance.heroImage,
-      'altImage': instance.altImage,
+Map<String, dynamic> _$KBeautyProductToJson(KBeautyProduct instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'images': instance.images,
+      'description': instance.description,
+      'price': instance.price,
       'rating': instance.rating,
-      'reviews': instance.reviews,
-      'targetUrl': instance.targetUrl,
-      'currentSku': instance.currentSku,
-      'sponsored': instance.sponsored,
-    };
-
-CurrentSku _$CurrentSkuFromJson(Map<String, dynamic> json) => CurrentSku(
-      skuId: json['skuId'] as String,
-      listPrice: json['listPrice'] as String,
-      salePrice: json['salePrice'] as String?,
-      valuePrice: json['valuePrice'] as String?,
-      imageAltText: json['imageAltText'] as String,
-      isNew: json['isNew'] as bool,
-      isOnlineOnly: json['isOnlineOnly'] as bool,
-      isSephoraExclusive: json['isSephoraExclusive'] as bool,
-      isLimitedEdition: json['isLimitedEdition'] as bool,
-    );
-
-Map<String, dynamic> _$CurrentSkuToJson(CurrentSku instance) =>
-    <String, dynamic>{
-      'skuId': instance.skuId,
-      'listPrice': instance.listPrice,
-      'salePrice': instance.salePrice,
-      'valuePrice': instance.valuePrice,
-      'imageAltText': instance.imageAltText,
-      'isNew': instance.isNew,
-      'isOnlineOnly': instance.isOnlineOnly,
-      'isSephoraExclusive': instance.isSephoraExclusive,
-      'isLimitedEdition': instance.isLimitedEdition,
-    };
-
-Category _$CategoryFromJson(Map<String, dynamic> json) => Category(
-      categoryId: json['categoryId'] as String,
-      displayName: json['displayName'] as String,
-      hasChildCategories: json['hasChildCategories'] as bool,
-      hasDropdownMenu: json['hasDropdownMenu'] as bool,
-      selectedThumbImage: json['selectedThumbImage'] as String?,
-      showInAppJaBsDropdown: json['showInAppJaBsDropdown'] as bool,
-      targetUrl: json['targetUrl'] as String,
-      thumbImage: json['thumbImage'] as String?,
-    );
-
-Map<String, dynamic> _$CategoryToJson(Category instance) => <String, dynamic>{
-      'categoryId': instance.categoryId,
-      'displayName': instance.displayName,
-      'hasChildCategories': instance.hasChildCategories,
-      'hasDropdownMenu': instance.hasDropdownMenu,
-      'selectedThumbImage': instance.selectedThumbImage,
-      'showInAppJaBsDropdown': instance.showInAppJaBsDropdown,
-      'targetUrl': instance.targetUrl,
-      'thumbImage': instance.thumbImage,
-    };
-
-CategoriesResponse _$CategoriesResponseFromJson(Map<String, dynamic> json) =>
-    CategoriesResponse(
-      rootCategories: (json['rootCategories'] as List<dynamic>)
-          .map((e) => Category.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-
-Map<String, dynamic> _$CategoriesResponseToJson(CategoriesResponse instance) =>
-    <String, dynamic>{
-      'rootCategories': instance.rootCategories,
-    };
-
-SephoraResponse _$SephoraResponseFromJson(Map<String, dynamic> json) =>
-    SephoraResponse(
-      categoryId: json['categoryId'] as String,
-      displayName: json['displayName'] as String,
-      currentPage: (json['currentPage'] as num).toInt(),
-      pageSize: (json['pageSize'] as num).toInt(),
-      totalProducts: (json['totalProducts'] as num).toInt(),
-      products: (json['products'] as List<dynamic>)
-          .map((e) => Product.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      categories: (json['categories'] as List<dynamic>)
-          .map((e) => Category.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-
-Map<String, dynamic> _$SephoraResponseToJson(SephoraResponse instance) =>
-    <String, dynamic>{
-      'categoryId': instance.categoryId,
-      'displayName': instance.displayName,
-      'currentPage': instance.currentPage,
-      'pageSize': instance.pageSize,
-      'totalProducts': instance.totalProducts,
-      'products': instance.products,
       'categories': instance.categories,
+      'ingredient': instance.ingredient,
+      'skinType': instance.skinType,
+      'bestFor': instance.bestFor,
+      'routine': instance.routine,
+    };
+
+KBeautyTreatment _$KBeautyTreatmentFromJson(Map<String, dynamic> json) =>
+    KBeautyTreatment(
+      id: (json['id'] as num).toInt(),
+      name: json['name'] as String,
+      price: (json['price'] as num).toInt(),
+      duration: json['duration'] as String,
+      whatItIs: json['whatItIs'] as String,
+      whyItWorks: json['whyItWorks'] as String,
+      bestFor: json['bestFor'] as String,
+      results: json['results'] as String,
+      skinConcern: json['skinConcern'] as String,
+      skinTypes:
+          (json['skinTypes'] as List<dynamic>).map((e) => e as String).toList(),
+      recommendedProducts: (json['recommendedProducts'] as List<dynamic>)
+          .map((e) => (e as num).toInt())
+          .toList(),
+    );
+
+Map<String, dynamic> _$KBeautyTreatmentToJson(KBeautyTreatment instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'price': instance.price,
+      'duration': instance.duration,
+      'whatItIs': instance.whatItIs,
+      'whyItWorks': instance.whyItWorks,
+      'bestFor': instance.bestFor,
+      'results': instance.results,
+      'skinConcern': instance.skinConcern,
+      'skinTypes': instance.skinTypes,
+      'recommendedProducts': instance.recommendedProducts,
+    };
+
+KBeautyData _$KBeautyDataFromJson(Map<String, dynamic> json) => KBeautyData(
+      skinTypes:
+          (json['skinTypes'] as List<dynamic>).map((e) => e as String).toList(),
+      categories: (json['categories'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
+      products: (json['products'] as List<dynamic>)
+          .map((e) => KBeautyProduct.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      treatments: (json['treatments'] as List<dynamic>)
+          .map((e) => KBeautyTreatment.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$KBeautyDataToJson(KBeautyData instance) =>
+    <String, dynamic>{
+      'skinTypes': instance.skinTypes,
+      'categories': instance.categories,
+      'products': instance.products,
+      'treatments': instance.treatments,
     };

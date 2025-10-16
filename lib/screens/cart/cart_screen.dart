@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../themes/app_theme.dart';
 import '../../widgets/common/index.dart';
+import '../../widgets/common/budget_dialogs.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/budget_provider.dart';
 import '../../providers/currency_provider.dart';
@@ -139,14 +140,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     const SizedBox(height: 20),
                     
                     // Continue button
-                    PrimaryButton(
-                      text: 'Continue',
-                      onPressed: () {
-                        _showPaymentDrawer(context);
-                      },
-                      width: double.infinity,
-                      size: ButtonSize.large,
-                    ),
+                    _buildContinueButton(),
                   ],
                 ),
               ),
@@ -340,6 +334,186 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     );
   }
 
+  Widget _buildContinueButton() {
+    return Consumer(
+      builder: (context, ref, child) {
+        final hasBudget = ref.watch(hasBudgetSetupProvider);
+        final budgetProfile = ref.watch(budgetProfileProvider);
+        final usdCartTotal = ref.watch(cartTotalProvider);
+        final currency = ref.watch(currencyProvider);
+        final convertedCartTotal = CurrencyUtils.convertPrice(usdCartTotal, currency);
+        
+        // Check if budget is required
+        if (!hasBudget || budgetProfile == null) {
+          return Column(
+            children: [
+              // Budget warning
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.warning_amber,
+                      color: Colors.orange,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Budget Required',
+                            style: TextStyle(
+                              color: Colors.orange,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'You need to set a budget before you can continue shopping.',
+                            style: TextStyle(
+                              color: Colors.orange.withOpacity(0.8),
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Disabled continue button
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: () {
+                    _showBudgetRequiredDialog();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'Set Budget First',
+                    style: TextStyle(
+                      color: AppColors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+
+        // Check if over budget
+        final convertedMonthlyBudget = CurrencyUtils.convertPrice(budgetProfile.monthlyBudget, currency);
+        final convertedCurrentSpent = CurrencyUtils.convertPrice(budgetProfile.currentMonthSpent, currency);
+        final potentialNewSpent = convertedCurrentSpent + convertedCartTotal;
+        final isOverBudget = potentialNewSpent > convertedMonthlyBudget;
+        
+        if (isOverBudget) {
+          final overAmount = potentialNewSpent - convertedMonthlyBudget;
+          return Column(
+            children: [
+              // Over budget warning
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.red.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      color: Colors.red,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Over Budget!',
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'This purchase will exceed your budget by ${CurrencyUtils.formatPrice(overAmount, currency)}.',
+                            style: TextStyle(
+                              color: Colors.red.withOpacity(0.8),
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Disabled continue button
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: () {
+                    _showOverBudgetDialog(overAmount, currency);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'Over Budget - Cannot Continue',
+                    style: TextStyle(
+                      color: AppColors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+
+        // Normal continue button
+        return PrimaryButton(
+          text: 'Continue',
+          onPressed: () {
+            _showPaymentDrawer(context);
+          },
+          width: double.infinity,
+          size: ButtonSize.large,
+        );
+      },
+    );
+  }
+
   Widget _buildBudgetProgress(WidgetRef ref, double cartTotal) {
     final budgetProfile = ref.watch(budgetProfileProvider);
     final hasBudget = ref.watch(hasBudgetSetupProvider);
@@ -446,6 +620,182 @@ class _CartScreenState extends ConsumerState<CartScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => const PaymentDrawer(),
+    );
+  }
+
+  void _showBudgetRequiredDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).brightness == Brightness.dark 
+            ? AppColors.darkSurface 
+            : AppColors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: Colors.orange.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.account_balance_wallet,
+                size: 40,
+                color: Colors.orange,
+              ),
+            ),
+            const SizedBox(height: 24),
+            const TitleText(
+              'Set Your Budget',
+              color: Colors.orange,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            BodyText(
+              'You need to set a monthly budget before you can proceed with checkout. This helps you manage your spending.',
+              textAlign: TextAlign.center,
+              color: Theme.of(context).brightness == Brightness.dark 
+                  ? AppColors.creamBackground.withOpacity(0.8)
+                  : AppColors.lightText,
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: Colors.orange),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      'Later',
+                      style: TextStyle(color: Colors.orange),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      BudgetDialogs.showBudgetSetupDialog(context, ref);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      'Set Budget',
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showOverBudgetDialog(double overAmount, String currency) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).brightness == Brightness.dark 
+            ? AppColors.darkSurface 
+            : AppColors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.warning,
+                size: 40,
+                color: Colors.red,
+              ),
+            ),
+            const SizedBox(height: 24),
+            const TitleText(
+              'Budget Exceeded!',
+              color: Colors.red,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            BodyText(
+              'This purchase would exceed your monthly budget by ${CurrencyUtils.formatPrice(overAmount, currency)}. Please remove some items or increase your budget.',
+              textAlign: TextAlign.center,
+              color: Theme.of(context).brightness == Brightness.dark 
+                  ? AppColors.creamBackground.withOpacity(0.8)
+                  : AppColors.lightText,
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: Colors.red),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      'Edit Cart',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      BudgetDialogs.showBudgetSetupDialog(context, ref);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      'Increase Budget',
+                      style: TextStyle(
+                        color: AppColors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

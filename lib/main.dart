@@ -1,42 +1,24 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'themes/app_theme.dart';
 import 'screens/splash_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/auth/sign_in_screen.dart';
+import 'screens/auth/post_signin_choice_screen.dart';
 import 'screens/discovery/skin_discovery_screen.dart';
 import 'screens/quiz/skin_quiz_screen.dart';
 import 'screens/quiz/quiz_results_screen.dart';
 import 'screens/main/main_navigation_screen.dart';
 import 'models/quiz_models.dart';
 import 'widgets/auth/auth_wrapper.dart';
-import 'utils/test_firestore.dart';
-import 'utils/setup_database.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Load environment variables
-  await dotenv.load(fileName: ".env");
-  
   try {
     await Firebase.initializeApp();
     print('Firebase initialized successfully');
-    
-    // Enable Firestore offline persistence (optional)
-    FirebaseFirestore.instance.settings = const Settings(
-      persistenceEnabled: true,
-    );
-    print('Firestore configured successfully');
-    
-    // Test Firestore connection (remove this after confirming it works)
-    await FirestoreTest.testConnection();
-    
-    // Ensure products exist in database
-    await DatabaseSetup.ensureProductsExist();
   } catch (e) {
     print('Firebase initialization failed: $e');
   }
@@ -68,6 +50,8 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(builder: (context) => const OnboardingScreen());
           case '/signin':
             return MaterialPageRoute(builder: (context) => const SignInScreen());
+          case '/post-signin-choice':
+            return MaterialPageRoute(builder: (context) => const PostSignInChoiceScreen());
           case '/discovery':
             return MaterialPageRoute(builder: (context) => const SkinDiscoveryScreen());
           case '/quiz':

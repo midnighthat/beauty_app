@@ -1,0 +1,138 @@
+[
+  {
+    "id": 1,
+    "name": "Aqua Peel (수분 아쿠아필)",
+    "price": 250,
+    "duration": "45–60 min",
+    "whatItIs": "Water-based suction to exfoliate, extract blackheads, and infuse hydration.",
+    "whyItWorks": "Gently unclogs pores while hydrating—perfect for oily skin.",
+    "bestFor": "Oily, Congested, or Acne-Prone Skin",
+    "results": "Smoother texture and smaller-looking pores.",
+    "skinConcern": "Oily/Acne",
+    "skinTypes": ["Oily", "Acne-Prone", "Combination"],
+    "recommendedProducts": [1, 2, 8, 9, 10]
+  },
+  {
+    "id": 2,
+    "name": "LHALA Fill Peel (LHA+PHA Micro Peeling)",
+    "price": 320,
+    "duration": "40 min",
+    "whatItIs": "Gentle clinic peel using LHA + PHA to refine texture.",
+    "whyItWorks": "Targets clogged pores with low irritation.",
+    "bestFor": "Oily + Acne + Texture",
+    "results": "More even skin with minimal downtime.",
+    "skinConcern": "Acne & Texture",
+    "skinTypes": ["Oily", "Acne-Prone"],
+    "recommendedProducts": [8, 9]
+  },
+  {
+    "id": 3,
+    "name": "Cica Balance Treatment (센텔라 진정 케어)",
+    "price": 240,
+    "duration": "50 min",
+    "whatItIs": "Centella + tea-tree calming facial after breakouts.",
+    "whyItWorks": "Repairs barrier and reduces redness.",
+    "bestFor": "Sensitive Oily / Over-treated Skin",
+    "results": "Balanced, matte-hydrated finish.",
+    "skinConcern": "Sensitivity/Acne",
+    "skinTypes": ["Oily", "Sensitive", "Acne-Prone"],
+    "recommendedProducts": [4, 10]
+  },
+
+  {
+    "id": 10,
+    "name": "Hydra Cica Moisture Facial",
+    "price": 270,
+    "duration": "60 min",
+    "whatItIs": "Enzyme cleanse + hyaluronic infusion + cica mask + ultrasonic hydration.",
+    "whyItWorks": "Humectants pull in water; cica calms; ultrasound improves penetration.",
+    "bestFor": "Dry / Dehydrated",
+    "results": "Plump, soft, comfortable skin.",
+    "skinConcern": "Dryness",
+    "skinTypes": ["Dry", "Normal", "Sensitive"],
+    "recommendedProducts": [101, 102, 104, 105, 106]
+  },
+  {
+    "id": 11,
+    "name": "Ultrasonic Water Infusion",
+    "price": 220,
+    "duration": "45 min",
+    "whatItIs": "Hyaluronic ampoule pushed deep with ultrasound.",
+    "whyItWorks": "Immediate hydration with no heaviness.",
+    "bestFor": "Very Dehydrated Skin",
+    "results": "Bounce and glow in one session.",
+    "skinConcern": "Dehydration",
+    "skinTypes": ["Dry", "Normal"],
+    "recommendedProducts": [104, 109]
+  },
+
+  {
+    "id": 20,
+    "name": "Dual-Zone Korean Facial",
+    "price": 290,
+    "duration": "60 min",
+    "whatItIs": "BHA on T-zone + hydration on cheeks + water-gel mask.",
+    "whyItWorks": "Treats different zones appropriately, like K-clinics.",
+    "bestFor": "Combination (oily T-zone, dry cheeks)",
+    "results": "Balanced matte–glow finish.",
+    "skinConcern": "Combination Balance",
+    "skinTypes": ["Combination"],
+    "recommendedProducts": [201, 203, 204, 206]
+  },
+
+  {
+    "id": 30,
+    "name": "Glass Skin Brightening Facial",
+    "price": 310,
+    "duration": "60–75 min",
+    "whatItIs": "Enzyme polish + vitamin ampoule + hydrating mask.",
+    "whyItWorks": "Gentle brightening with hydration for translucency.",
+    "bestFor": "Normal / Dullness",
+    "results": "Even tone and glassy radiance.",
+    "skinConcern": "Dullness",
+    "skinTypes": ["Normal", "Dull", "Combination"],
+    "recommendedProducts": [301, 302, 303, 305]
+  },
+
+  {
+    "id": 40,
+    "name": "Cica Barrier Reset",
+    "price": 240,
+    "duration": "50 min",
+    "whatItIs": "Milk cleanse + panthenol/cica ampoule + cooling mask (no acids).",
+    "whyItWorks": "Removes irritation triggers; strengthens barrier.",
+    "bestFor": "Sensitivity / Overuse",
+    "results": "Less redness; calmer skin.",
+    "skinConcern": "Sensitivity",
+    "skinTypes": ["Sensitive", "Dry", "Normal"],
+    "recommendedProducts": [401, 402, 403, 404, 405]
+  },
+
+  {
+    "id": 50,
+    "name": "Glow Enzyme Facial",
+    "price": 260,
+    "duration": "60 min",
+    "whatItIs": "Fruit enzyme peel + vitamin sheet mask.",
+    "whyItWorks": "Removes dull cells; infuses brightening actives.",
+    "bestFor": "Dull / Rough Texture",
+    "results": "Brighter, smoother skin.",
+    "skinConcern": "Dullness",
+    "skinTypes": ["Dull", "Normal"],
+    "recommendedProducts": [601, 602, 603, 606]
+  },
+
+  {
+    "id": 60,
+    "name": "Brightening Vitamin Infusion",
+    "price": 320,
+    "duration": "60 min",
+    "whatItIs": "Vitamin C + niacinamide ampoule infusion and SPF coaching.",
+    "whyItWorks": "Targets melanin while keeping the barrier calm.",
+    "bestFor": "Post-acne marks / uneven tone",
+    "results": "More even tone over sessions.",
+    "skinConcern": "Hyperpigmentation",
+    "skinTypes": ["Hyperpigmented", "Dull", "Combination"],
+    "recommendedProducts": [701, 702, 703, 705]
+  }
+]

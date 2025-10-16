@@ -14,17 +14,22 @@ class OnboardingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final bottomSafeArea = MediaQuery.of(context).padding.bottom;
     
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Image
-          Expanded(
+          // Image section - flexible but constrained
+          Flexible(
             flex: 3,
             child: Container(
               width: double.infinity,
+              constraints: BoxConstraints(
+                maxHeight: screenHeight * 0.45, // Max 45% of screen height
+                minHeight: 200, // Minimum height for the image
+              ),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
               ),
@@ -34,45 +39,54 @@ class OnboardingPage extends StatelessWidget {
                   data.image,
                   width: double.infinity,
                   fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    // Fallback for missing images
+                    return Container(
+                      color: AppColors.primaryBrown.withOpacity(0.1),
+                      child: Icon(
+                        Icons.image,
+                        size: 64,
+                        color: AppColors.primaryBrown.withOpacity(0.5),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),
           ),
 
-          const SizedBox(height: 40),
+          SizedBox(height: screenHeight * 0.03), // Responsive spacing
 
-          // Content
-          Expanded(
+          // Content section - flexible and scrollable
+          Flexible(
             flex: 2,
-            child: Column(
-              children: [
-                // Title
-                DisplayText(
-                  data.title,
-                  textAlign: TextAlign.center,
-                  color: isDark ? AppColors.creamBackground : AppColors.darkText,
-                ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Title
+                  DisplayText(
+                    data.title,
+                    textAlign: TextAlign.center,
+                    color: isDark ? AppColors.creamBackground : AppColors.darkText,
+                  ),
 
-                const SizedBox(height: 12),
+                  SizedBox(height: screenHeight * 0.015),
 
-                // Subtitle
-                SubheadingText(
-                  data.subtitle,
-                  textAlign: TextAlign.center,
-                  color: isDark ? AppColors.creamBackground.withOpacity(0.9) : AppColors.darkText,
-                ),
+                  // Subtitle
+                  SubheadingText(
+                    data.subtitle,
+                    textAlign: TextAlign.center,
+                    color: isDark ? AppColors.creamBackground.withOpacity(0.9) : AppColors.darkText,
+                  ),
 
-                const SizedBox(height: 20),
-
-                // Description
-                BodyText(
-                  data.description,
-                  textAlign: TextAlign.center,
-                  color: isDark ? AppColors.creamBackground.withOpacity(0.8) : AppColors.lightText,
-                ),
-              ],
+                ],
+              ),
             ),
           ),
+          
+          // Add bottom padding to account for the bottom navigation
+          SizedBox(height: 100 + bottomSafeArea), // Space for indicators + button + safe area
         ],
       ),
     );

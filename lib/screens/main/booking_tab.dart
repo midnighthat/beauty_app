@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../themes/app_theme.dart';
 import '../../widgets/common/index.dart';
+import '../../providers/booking_provider.dart';
+import '../../providers/currency_provider.dart';
+import '../../widgets/booking/booking_widgets.dart';
 
 class BookingTab extends ConsumerStatefulWidget {
   const BookingTab({super.key});
@@ -11,14 +14,19 @@ class BookingTab extends ConsumerStatefulWidget {
 }
 
 class _BookingTabState extends ConsumerState<BookingTab> {
-  DateTime selectedDate = DateTime.now();
-  String selectedTime = '';
-  String selectedStylist = '';
-  String appointmentFor = 'Myself';
+  @override
+  void initState() {
+    super.initState();
+    // Initialize booking state with current date
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(bookingProvider.notifier).setDate(DateTime.now());
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bookingState = ref.watch(bookingProvider);
     
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.creamBackground,
@@ -35,17 +43,10 @@ class _BookingTabState extends ConsumerState<BookingTab> {
                 bottomRight: Radius.circular(30),
               ),
             ),
-            child: Row(
-              children: [
-                const Expanded(
-                  child: TitleText(
-                    'Set Appointment',
-                    color: AppColors.white,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                const SizedBox(width: 48), // Balance the back button
-              ],
+            child: const TitleText(
+              'Book Treatment',
+              color: AppColors.white,
+              textAlign: TextAlign.center,
             ),
           ),
           
@@ -56,28 +57,35 @@ class _BookingTabState extends ConsumerState<BookingTab> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Selected Treatment Display (if any)
+                  if (bookingState.selectedTreatment != null)
+                    _buildSelectedTreatmentSection(bookingState, isDark),
+                  
+                  if (bookingState.selectedTreatment != null)
+                    const SizedBox(height: 30),
+                  
                   // Calendar Section
-                  _buildCalendarSection(),
+                  _buildCalendarSection(bookingState),
                   
                   const SizedBox(height: 30),
                   
                   // Service Selection
-                  _buildServiceSection(),
+                  _buildServiceSection(bookingState),
                   
                   const SizedBox(height: 30),
                   
                   // Available Times
-                  _buildTimeSection(),
+                  _buildTimeSection(bookingState),
                   
                   const SizedBox(height: 30),
                   
                   // Appointment For
-                  _buildAppointmentForSection(isDark),
+                  _buildAppointmentForSection(bookingState, isDark),
                   
                   const SizedBox(height: 40),
                   
                   // Book Now Button
-                  _buildBookButton(),
+                  _buildBookButton(bookingState),
                   
                   // Add bottom padding for the island tab bar
                   const SizedBox(height: 100),
@@ -90,7 +98,91 @@ class _BookingTabState extends ConsumerState<BookingTab> {
     );
   }
 
-  Widget _buildCalendarSection() {
+  Widget _buildSelectedTreatmentSection(BookingState bookingState, bool isDark) {
+    final treatment = bookingState.selectedTreatment!;
+    
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.primaryBrown.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppColors.primaryBrown.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: AppColors.primaryBrown.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(
+              Icons.spa,
+              color: AppColors.primaryBrown,
+              size: 24,
+            ),
+          ),
+          
+          const SizedBox(width: 16),
+          
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TitleText(
+                  treatment.name,
+                  color: isDark ? AppColors.creamBackground : AppColors.darkText,
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(Icons.access_time, size: 14, color: AppColors.lightText),
+                    const SizedBox(width: 4),
+                    CaptionText(
+                      treatment.duration,
+                      color: AppColors.lightText,
+                    ),
+                    const SizedBox(width: 12),
+                    Icon(Icons.attach_money, size: 14, color: AppColors.primaryBrown),
+                    const SizedBox(width: 4),
+                    Consumer(
+                      builder: (context, ref, child) {
+                        final currency = ref.watch(currencyProvider);
+                        final price = treatment.price.toDouble();
+                        final convertedPrice = CurrencyUtils.convertPrice(price, currency);
+                        return CaptionText(
+                          CurrencyUtils.formatPrice(convertedPrice, currency),
+                          color: AppColors.primaryBrown,
+                          fontWeight: FontWeight.w600,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          
+          IconButton(
+            onPressed: () {
+              ref.read(bookingProvider.notifier).clearTreatment();
+            },
+            icon: const Icon(
+              Icons.close,
+              color: AppColors.lightText,
+              size: 20,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCalendarSection(BookingState bookingState) {
     return Column(
       children: [
         // Month header
@@ -100,13 +192,13 @@ class _BookingTabState extends ConsumerState<BookingTab> {
             IconButton(
               icon: const Icon(Icons.chevron_left, color: AppColors.primaryBrown),
               onPressed: () {
-                setState(() {
-                  selectedDate = DateTime(selectedDate.year, selectedDate.month - 1);
-                });
+                final newDate = DateTime(bookingState.selectedDate?.year ?? DateTime.now().year, 
+                                        (bookingState.selectedDate?.month ?? DateTime.now().month) - 1);
+                ref.read(bookingProvider.notifier).setDate(newDate);
               },
             ),
             TitleText(
-              _getMonthName(selectedDate.month),
+              _getMonthName((bookingState.selectedDate ?? DateTime.now()).month),
               color: Theme.of(context).brightness == Brightness.dark 
                   ? AppColors.creamBackground 
                   : AppColors.darkText,
@@ -114,9 +206,9 @@ class _BookingTabState extends ConsumerState<BookingTab> {
             IconButton(
               icon: const Icon(Icons.chevron_right, color: AppColors.primaryBrown),
               onPressed: () {
-                setState(() {
-                  selectedDate = DateTime(selectedDate.year, selectedDate.month + 1);
-                });
+                final newDate = DateTime(bookingState.selectedDate?.year ?? DateTime.now().year, 
+                                        (bookingState.selectedDate?.month ?? DateTime.now().month) + 1);
+                ref.read(bookingProvider.notifier).setDate(newDate);
               },
             ),
           ],
@@ -132,7 +224,9 @@ class _BookingTabState extends ConsumerState<BookingTab> {
 
   Widget _buildCalendarGrid() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bookingState = ref.watch(bookingProvider);
     final today = DateTime.now();
+    final selectedDate = bookingState.selectedDate ?? today;
     final firstDayOfMonth = DateTime(selectedDate.year, selectedDate.month, 1);
     final startDate = firstDayOfMonth.subtract(Duration(days: firstDayOfMonth.weekday % 7));
     
@@ -158,9 +252,7 @@ class _BookingTabState extends ConsumerState<BookingTab> {
         
         return GestureDetector(
           onTap: isCurrentMonth ? () {
-            setState(() {
-              selectedDate = date;
-            });
+            ref.read(bookingProvider.notifier).setDate(date);
           } : null,
           child: Container(
             decoration: BoxDecoration(
@@ -197,7 +289,7 @@ class _BookingTabState extends ConsumerState<BookingTab> {
     );
   }
 
-  Widget _buildServiceSection() {
+  Widget _buildServiceSection(BookingState bookingState) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Column(
@@ -206,7 +298,7 @@ class _BookingTabState extends ConsumerState<BookingTab> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             TitleText(
-              'Hair Stylish',
+              'Skincare Consultants',
               color: isDark ? AppColors.creamBackground : AppColors.darkText,
             ),
             GestureDetector(
@@ -228,34 +320,30 @@ class _BookingTabState extends ConsumerState<BookingTab> {
           height: 160,
           child: ListView(
             scrollDirection: Axis.horizontal,
-            children: [
-              SizedBox(
+            children: ref.watch(availableConsultantsProvider).map((consultant) {
+              return Container(
                 width: 140,
-                child: _buildStylistCard('Elly', '4.5', 'assets/images/profile-image-1.jpg', selectedStylist == 'Elly'),
-              ),
-              const SizedBox(width: 16),
-              SizedBox(
-                width: 140,
-                child: _buildStylistCard('Clara', '4.2', 'assets/images/profile-image-2.jpg', selectedStylist == 'Clara'),
-              ),
-              const SizedBox(width: 16),
-              SizedBox(
-                width: 140,
-                child: _buildStylistCard('Sofia', '4.8', 'assets/images/profile-image-3.jpg', selectedStylist == 'Sofia'),
-              ),
-            ],
+                margin: const EdgeInsets.only(right: 16),
+                child: _buildStylistCard(
+                  consultant.name, 
+                  consultant.rating.toString(), 
+                  consultant.imagePath, 
+                  bookingState.selectedConsultant == consultant.name,
+                  consultant,
+                ),
+              );
+            }).toList(),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildStylistCard(String name, String rating, String imagePath, bool isSelected) {
+  Widget _buildStylistCard(String name, String rating, String imagePath, bool isSelected, Consultant consultant) {
     return GestureDetector(
       onTap: () {
-        setState(() {
-          selectedStylist = name;
-        });
+        ref.read(bookingProvider.notifier).setConsultant(name);
+        _showConsultantDetails(consultant);
       },
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -345,14 +433,9 @@ class _BookingTabState extends ConsumerState<BookingTab> {
     );
   }
 
-  Widget _buildTimeSection() {
+  Widget _buildTimeSection(BookingState bookingState) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final timeSlots = [
-      '11:00 AM', '11:30 AM', '01:00 PM', '01:30 PM',
-      '02:00 PM', '03:00 PM', '04:00 PM', 
-      '05:00 PM', '06:00 PM', '07:00 PM',
-      '08:00 PM'
-    ];
+    final timeSlots = ref.watch(availableTimeSlotsProvider);
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -368,12 +451,10 @@ class _BookingTabState extends ConsumerState<BookingTab> {
           spacing: 12,
           runSpacing: 12,
           children: timeSlots.map((time) {
-            final isSelected = selectedTime == time;
+            final isSelected = bookingState.selectedTime == time;
             return GestureDetector(
               onTap: () {
-                setState(() {
-                  selectedTime = time;
-                });
+                ref.read(bookingProvider.notifier).setTime(time);
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -397,7 +478,7 @@ class _BookingTabState extends ConsumerState<BookingTab> {
     );
   }
 
-  Widget _buildAppointmentForSection(bool isDark) {
+  Widget _buildAppointmentForSection(BookingState bookingState, bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -417,7 +498,7 @@ class _BookingTabState extends ConsumerState<BookingTab> {
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
-              value: appointmentFor,
+              value: bookingState.appointmentFor,
               icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.primaryBrown),
               dropdownColor: isDark ? AppColors.darkSurface : AppColors.white,
               items: ['Myself', 'Family Member', 'Friend'].map((String value) {
@@ -432,9 +513,7 @@ class _BookingTabState extends ConsumerState<BookingTab> {
               }).toList(),
               onChanged: (String? newValue) {
                 if (newValue != null) {
-                  setState(() {
-                    appointmentFor = newValue;
-                  });
+                  ref.read(bookingProvider.notifier).setAppointmentFor(newValue);
                 }
               },
             ),
@@ -444,20 +523,249 @@ class _BookingTabState extends ConsumerState<BookingTab> {
     );
   }
 
-  Widget _buildBookButton() {
-    return PrimaryButton(
-      text: 'Book Now',
-      onPressed: () {
-        // TODO: Handle booking
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Appointment booked successfully!'),
-            backgroundColor: AppColors.primaryBrown,
+  Widget _buildBookButton(BookingState bookingState) {
+    return Column(
+      children: [
+        // Select Treatment button if no treatment selected
+        if (bookingState.selectedTreatment == null)
+          PrimaryButton(
+            text: 'Select Treatment',
+            onPressed: _showTreatmentSelection,
+            width: double.infinity,
+            size: ButtonSize.large,
+            icon: const Icon(Icons.spa, color: AppColors.white, size: 18),
           ),
-        );
-      },
-      width: double.infinity,
-      size: ButtonSize.large,
+        
+        // Continue to booking button if treatment selected
+        if (bookingState.selectedTreatment != null)
+          PrimaryButton(
+            text: bookingState.selectedDate != null && 
+                  bookingState.selectedTime != null && 
+                  bookingState.selectedConsultant != null
+                ? 'Review Booking'
+                : 'Complete Booking Details',
+            onPressed: bookingState.selectedDate != null && 
+                      bookingState.selectedTime != null && 
+                      bookingState.selectedConsultant != null
+                ? _showBookingConfirmation
+                : null,
+            width: double.infinity,
+            size: ButtonSize.large,
+          ),
+      ],
+    );
+  }
+
+  void _showTreatmentSelection() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => TreatmentSelectionDrawer(
+        onTreatmentSelected: () {
+          // Treatment has been selected, no additional action needed
+        },
+      ),
+    );
+  }
+
+  void _showBookingConfirmation() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => const BookingConfirmationDrawer(),
+    );
+  }
+
+  void _showConsultantDetails(Consultant consultant) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.7,
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkSurface : AppColors.white,
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(25),
+            topRight: Radius.circular(25),
+          ),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            // Modal handle
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.lightText.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // Consultant profile
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.primaryBrown.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: AppColors.primaryBrown.withOpacity(0.1),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppColors.primaryBrown,
+                        width: 3,
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(40),
+                      child: Image.asset(
+                        consultant.imagePath,
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.primaryBrown.withOpacity(0.2),
+                            ),
+                            child: const Icon(
+                              Icons.person,
+                              color: AppColors.primaryBrown,
+                              size: 40,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(width: 16),
+                  
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TitleText(
+                          consultant.name,
+                          color: isDark ? AppColors.creamBackground : AppColors.darkText,
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(Icons.star, color: Colors.amber, size: 18),
+                            const SizedBox(width: 6),
+                            CaptionText(
+                              consultant.rating.toString(),
+                              color: AppColors.primaryBrown,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: CaptionText(
+                                '${consultant.experienceYears} years experience',
+                                color: AppColors.lightText,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // Bio
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                HeadingText(
+                  'About',
+                  color: isDark ? AppColors.creamBackground : AppColors.darkText,
+                ),
+                const SizedBox(height: 8),
+                BodyText(
+                  consultant.bio,
+                  color: isDark ? AppColors.creamBackground.withOpacity(0.9) : AppColors.darkText,
+                ),
+              ],
+            ),
+            
+            const SizedBox(height: 20),
+            
+            // Specializations
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                HeadingText(
+                  'Specializations',
+                  color: isDark ? AppColors.creamBackground : AppColors.darkText,
+                ),
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Wrap(
+                    alignment: WrapAlignment.start,
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: consultant.specializations.map((spec) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryBrown.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: AppColors.primaryBrown.withOpacity(0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: CaptionText(
+                          spec,
+                          color: AppColors.primaryBrown,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ),
+            
+            const Spacer(),
+            
+            // Select button
+            PrimaryButton(
+              text: 'Select ${consultant.name}',
+              onPressed: () {
+                ref.read(bookingProvider.notifier).setConsultant(consultant.name);
+                Navigator.pop(context);
+              },
+              width: double.infinity,
+              size: ButtonSize.large,
+            ),
+          ],
+        ),
+      ),
     );
   }
 

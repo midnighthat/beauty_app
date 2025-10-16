@@ -20,20 +20,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     OnboardingData(
       image: 'assets/images/onboarding-1.png',
       title: 'Welcome to Hanglow',
-      subtitle: 'Your Personal Beauty Assistant',
-      description: 'Get personalized skincare recommendations powered by AI. Discover products that work best for your unique skin type.',
+      subtitle: 'Your Korean-style skin assistant for smarter routines & glowing skin',
+      description: '',
     ),
     OnboardingData(
       image: 'assets/images/onboarding-2.jpg',
-      title: 'Chat with AI Expert',
-      subtitle: 'Ask Anything About Skincare',
-      description: 'Have questions about ingredients, routines, or products? Our AI beauty expert is here to help you 24/7.',
+      title: 'Get Personalized Recommendations with AI Expert',
+      subtitle: 'Find what fits you',
+      description: '',
     ),
     OnboardingData(
       image: 'assets/images/onboarding-3.jpg',
-      title: 'Track Your Journey',
-      subtitle: 'Build Your Perfect Routine',
-      description: 'Save your favorite products, track your progress, and build the perfect skincare routine that works for you.',
+      title: 'Track Your Journey & Budgets',
+      subtitle: 'Build Your Perfect, Smarter Skincare and Balanced Budget',
+      description: '',
     ),
   ];
 

@@ -7,6 +7,44 @@ import '../../providers/currency_provider.dart';
 import '../../models/budget_models.dart';
 import 'index.dart';
 
+// Utility class for showing budget-related dialogs
+class BudgetDialogs {
+  static void showBudgetSetupDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const BudgetSetupDialog(),
+    );
+  }
+
+  static void showAddExpenseDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const AddExpenseDialog(),
+    );
+  }
+
+  static void showWellnessInputDialog(
+    BuildContext context, {
+    required String title,
+    required double currentValue,
+    required String unit,
+    required double maxValue,
+    required Function(double) onSave,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) => WellnessInputDialog(
+        title: title,
+        currentValue: currentValue,
+        unit: unit,
+        maxValue: maxValue,
+        onSave: onSave,
+      ),
+    );
+  }
+}
+
 class BudgetSetupDialog extends ConsumerStatefulWidget {
   const BudgetSetupDialog({super.key});
 
@@ -62,10 +100,15 @@ class _BudgetSetupDialogState extends ConsumerState<BudgetSetupDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
             // Header
             Row(
               children: [
@@ -230,7 +273,9 @@ class _BudgetSetupDialogState extends ConsumerState<BudgetSetupDialog> {
                 ),
               ],
             ),
-          ],
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -636,9 +681,11 @@ class _AddExpenseDialogState extends ConsumerState<AddExpenseDialog> {
       
       if (mounted) {
         Navigator.pop(context);
+        final currency = ref.read(currencyProvider);
+        final formattedAmount = CurrencyUtils.formatPrice(amount, currency);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Added \$${amount.toStringAsFixed(2)} expense for $productName'),
+            content: Text('Added $formattedAmount expense for $productName'),
             backgroundColor: Colors.green,
           ),
         );

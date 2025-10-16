@@ -17,6 +17,19 @@ class MainNavigationScreen extends ConsumerStatefulWidget {
 class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
   int _currentIndex = 0;
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    // Check if we have arguments for initial tab
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (args != null && args['initialTab'] != null) {
+      setState(() {
+        _currentIndex = args['initialTab'] as int;
+      });
+    }
+  }
+
   final List<Widget> _screens = [
     const HomeTab(),
     const ProductsTab(),

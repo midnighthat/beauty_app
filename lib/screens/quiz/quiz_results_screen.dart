@@ -4,6 +4,7 @@ import '../../themes/app_theme.dart';
 import '../../widgets/common/index.dart';
 import '../../models/quiz_models.dart';
 import '../../providers/skin_profile_provider.dart';
+import '../../providers/currency_provider.dart';
 import '../../services/preferences_service.dart';
 
 class QuizResultsScreen extends ConsumerStatefulWidget {
@@ -364,11 +365,18 @@ class _QuizResultsScreenState extends ConsumerState<QuizResultsScreen>
                               color: AppColors.primaryBrown,
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: CustomText(
-                              '\$${treatment.estimatedPrice.toInt()}',
-                              type: TextType.bodySmall,
-                              color: AppColors.white,
-                              fontWeight: FontWeight.bold,
+                            child: Consumer(
+                              builder: (context, ref, child) {
+                                final currency = ref.watch(currencyProvider);
+                                final price = treatment.estimatedPrice.toDouble();
+                                final convertedPrice = CurrencyUtils.convertPrice(price, currency);
+                                return CustomText(
+                                  CurrencyUtils.formatPrice(convertedPrice, currency),
+                                  type: TextType.bodySmall,
+                                  color: AppColors.white,
+                                  fontWeight: FontWeight.bold,
+                                );
+                              },
                             ),
                           ),
                         ],

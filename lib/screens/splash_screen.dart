@@ -46,12 +46,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   void _startAnimation() async {
     await _animationController.forward();
-    await Future.delayed(const Duration(milliseconds: 1500));
-    
-    if (mounted) {
-      // Navigate to onboarding screen
-      Navigator.pushReplacementNamed(context, '/onboarding');
-    }
+    // Remove navigation - let AuthWrapper handle it
   }
 
   @override

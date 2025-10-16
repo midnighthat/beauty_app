@@ -6,6 +6,7 @@ import '../models/budget_models.dart';
 class PreferencesService {
   static const String _hasSeenOnboardingKey = 'has_seen_onboarding';
   static const String _hasCompletedQuizKey = 'has_completed_quiz';
+  static const String _hasSeenPostSignInChoiceKey = 'has_seen_post_signin_choice';
   static const String _skinProfileKey = 'skin_profile';
   static const String _budgetProfileKey = 'budget_profile';
   static const String _wellnessDataKey = 'wellness_data_';
@@ -44,6 +45,25 @@ class PreferencesService {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(_hasCompletedQuizKey, value);
+    } catch (e) {
+      // Ignore errors in preference saving
+    }
+  }
+  
+  // Post sign-in choice methods
+  static Future<bool> getHasSeenPostSignInChoice() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getBool(_hasSeenPostSignInChoiceKey) ?? false;
+    } catch (e) {
+      return false;
+    }
+  }
+  
+  static Future<void> setHasSeenPostSignInChoice(bool value) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_hasSeenPostSignInChoiceKey, value);
     } catch (e) {
       // Ignore errors in preference saving
     }
@@ -179,6 +199,18 @@ class PreferencesService {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
+    } catch (e) {
+      // Ignore errors
+    }
+  }
+
+  // Reset specific app flow preferences (useful for testing)
+  static Future<void> resetAppFlow() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_hasCompletedQuizKey);
+      await prefs.remove(_hasSeenPostSignInChoiceKey);
+      await prefs.remove(_skinProfileKey);
     } catch (e) {
       // Ignore errors
     }
